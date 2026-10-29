@@ -15,3 +15,7 @@ npm run build
 - CTA는 현재 화면에서 준비 중 안내를 표시합니다. 제품 진입 경로가 정해지면 연결하세요.
 - 다른 페이지, 업로드 기능, 공동 편집 기능, 백엔드는 구현하지 않았습니다.
 - 원본 Penpot 파일은 변경하지 않았습니다.
+
+## 대표 폰트
+
+Pretendard Variable v1.3.9를 로컬에서 제공합니다. 제목 650, 본문 400, CTA 600, 보조 안내 500을 사용합니다. 폰트와 SIL Open Font License는 `public/fonts/pretendard/`에 포함되어 있습니다.
