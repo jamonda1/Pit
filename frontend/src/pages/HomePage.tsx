@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ChangeEvent, CSSProperties } from 'react'
+import AnimatedContent from '../components/AnimatedContent'
 import { Sidebar } from '../components/Sidebar'
 import { Icon } from '../components/Icon'
 import './home.css'
@@ -20,9 +21,20 @@ export function HomePage({ onLanding }: { onLanding: () => void }) {
   const [notice, setNotice] = useState('')
   const search = useRef<HTMLInputElement>(null)
   const upload = useRef<HTMLInputElement>(null)
+  const searchRequested = useRef(false)
+  const openSearch = () => {
+    if (expanded) { searchRequested.current = true; setExpanded(false) }
+    else search.current?.focus()
+  }
+  useEffect(() => {
+    if (!expanded && searchRequested.current) {
+      searchRequested.current = false
+      search.current?.focus()
+    }
+  }, [expanded])
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k' && !expanded) { event.preventDefault(); search.current?.focus() }
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openSearch() }
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
@@ -39,25 +51,25 @@ export function HomePage({ onLanding }: { onLanding: () => void }) {
   }
   const results = recent.filter(item => item.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
   return <div className="workspace">
-    <Sidebar expanded={expanded} onToggle={() => setExpanded(value => !value)} onLanding={onLanding} onNotice={setNotice}/>
+    <Sidebar expanded={expanded} onToggle={() => setExpanded(value => !value)} onLanding={onLanding} onNotice={setNotice} onSearch={openSearch}/>
     <div className="workspace-content" inert={expanded}>
       <header className="workspace-top"><p>WORKSPACE&nbsp; / &nbsp;홈</p><button className="notification-button" aria-label="알림" onClick={() => setNotice('새로운 알림이 없습니다.')}><Icon name="bell"/></button></header>
       <main className="home-main">
-        <section className="home-hero" aria-labelledby="home-title">
+        <AnimatedContent distance={22} duration={0.75}><section className="home-hero" aria-labelledby="home-title">
           <h1 id="home-title" tabIndex={-1}>오늘은 어떤 프레젠테이션을 만들어볼까요?</h1>
           <p>새로운 슬라이드를 시작하거나, 기존 PPTX를 불러와 함께 편집하세요.</p>
           <div className="search-box"><Icon name="search"/><input ref={search} type="search" aria-label="내 프레젠테이션 검색" placeholder="내 프레젠테이션 검색" value={query} onChange={event => setQuery(event.target.value)} /><button aria-label="검색창으로 이동" onClick={() => search.current?.focus()}><kbd>⌘ K</kbd></button></div>
           <div className="home-hero-art" aria-hidden="true"><span>MAKE IT TOGETHER</span><div className="hero-orb"/><div className="art-deck art-deck--rear"/><div className="art-deck art-deck--center"><i/><b/><i/><i/></div><div className="art-deck art-deck--front"><i/><div><b/><b/><b/></div></div></div>
-        </section>
+        </section></AnimatedContent>
         <section className="quick-start" aria-labelledby="quick-title"><h2 id="quick-title">새로 시작하기</h2><p className="section-description">원하는 형식을 선택하면 빈 PPTX에서 바로 시작해요.</p>
-          <div className="create-grid">{formats.map(format => <button key={format.ratio} className="create-card" onClick={() => setNotice(`${format.ratio} ${format.name} 선택 완료. 프레젠테이션 편집 기능은 준비 중입니다.`)}>
+          <div className="create-grid">{formats.map((format, index) => <AnimatedContent key={format.ratio} distance={26} duration={0.75} delay={index * 0.09}><button className="create-card" onClick={() => setNotice(`${format.ratio} ${format.name} 선택 완료. 프레젠테이션 편집 기능은 준비 중입니다.`)}>
             <div className="create-card-body"><div className="format-preview" style={{ background: format.color }}><div className={`mini-slide mini-slide--${format.ratio.replace(':', '-')}`}><i/><i/></div></div><div className="format-info"><span>{format.ratio}</span><h3>{format.name}</h3><p>{format.detail}</p></div></div><span className="create-action">새로 만들기 <span aria-hidden="true">↗</span></span>
-          </button>)}
-          <div className="upload-card"><span className="upload-icon"><Icon name="upload"/></span><h3>PPTX 파일 가져오기</h3><p>기존 파일을 업로드하고 함께 편집하세요.</p><button onClick={() => upload.current?.click()}>파일 업로드 <span aria-hidden="true">↗</span></button><input ref={upload} className="sr-only" tabIndex={-1} type="file" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" aria-label="PPTX 파일 선택" onChange={selectFile}/></div>
+          </button></AnimatedContent>)}
+          <AnimatedContent distance={26} duration={0.75} delay={0.27}><div className="upload-card"><span className="upload-icon"><Icon name="upload"/></span><h3>PPTX 파일 가져오기</h3><p>기존 파일을 업로드하고 함께 편집하세요.</p><button onClick={() => upload.current?.click()}>파일 업로드 <span aria-hidden="true">↗</span></button><input ref={upload} className="sr-only" tabIndex={-1} type="file" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" aria-label="PPTX 파일 선택" onChange={selectFile}/></div></AnimatedContent>
           </div>
         </section>
         <section className="recent-section" aria-labelledby="recent-title"><div className="section-heading"><h2 id="recent-title">최근 작업</h2><button onClick={() => { setQuery(''); setNotice('현재 제공되는 최근 작업 4개를 모두 표시합니다.') }}>모두 보기 <span aria-hidden="true">→</span></button></div>
-          <div className="recent-grid">{results.map(item => <button className="recent-card" key={item.name} onClick={() => setNotice(`${item.name}은 디자인 미리보기 자료입니다. 편집 기능은 준비 중입니다.`)}><div className="recent-thumbnail" style={{ background: item.color, '--thumbnail-accent': item.accent } as CSSProperties}><div className="recent-slide"><i/><i/><i/></div></div><div className="recent-info"><h3>{item.name}</h3><p>{item.updated}</p><small>{item.privacy}</small></div></button>)}</div>
+          <div className="recent-grid">{results.map((item, index) => <AnimatedContent key={item.name} distance={24} duration={0.7} delay={index * 0.08}><button className="recent-card" onClick={() => setNotice(`${item.name}은 디자인 미리보기 자료입니다. 편집 기능은 준비 중입니다.`)}><div className="recent-thumbnail" style={{ background: item.color, '--thumbnail-accent': item.accent } as CSSProperties}><div className="recent-slide"><i/><i/><i/></div></div><div className="recent-info"><h3>{item.name}</h3><p>{item.updated}</p><small>{item.privacy}</small></div></button></AnimatedContent>)}</div>
           {!results.length && <p className="search-empty" role="status">‘{query}’에 해당하는 프레젠테이션이 없습니다.</p>}
         </section>
       </main>
