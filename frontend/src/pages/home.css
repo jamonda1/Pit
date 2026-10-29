@@ -1,4 +1,4 @@
-.workspace { min-height: 100svh; background: #f7faf8; color: #183d2d; }
+.workspace { --sidebar-expanded-width: 209px; min-height: 100svh; background: #f7faf8; color: #183d2d; }
 .workspace button { border: 0; }
 .sidebar { position: fixed; z-index: 40; inset: 0 auto 0 0; width: 64px; background: white; border-right: 1px solid #e2ebe5; overflow: hidden; --sidebar-duration: 480ms; --sidebar-ease: cubic-bezier(.22, 1, .36, 1); transition: width var(--sidebar-duration) var(--sidebar-ease); }
 .sidebar-brand { position: absolute; top: 21px; left: 10px; width: 44px; height: 44px; padding: 0; background: transparent; }
@@ -6,7 +6,7 @@
 /* Keep both assets mounted so toggling never swaps an image mid-frame. */
 .sidebar-brand .sidebar-logo { position: absolute; top: 0; left: 0; display: block; object-fit: contain; transform-origin: top left; transition: opacity 260ms ease, transform var(--sidebar-duration) var(--sidebar-ease); }
 .sidebar-logo--symbol { width: 44px; height: 44px; opacity: 1; transform: scale(1); }
-.sidebar-logo--wordmark { width: 149px; height: 98.47px; opacity: 0; transform: translateX(-6px) scale(.84); }
+.sidebar-logo--wordmark { width: 134.1px; height: 88.62px; opacity: 0; transform: translateX(-6px) scale(.84); }
 .sidebar--expanded .sidebar-logo--symbol { opacity: 0; transform: scale(.9); }
 .sidebar--expanded .sidebar-logo--wordmark { opacity: 1; transform: none; transition-delay: 80ms, 0ms; }
 .sidebar-label { opacity: 0; visibility: hidden; transform: translateX(-8px); transition: opacity 160ms ease, transform 240ms var(--sidebar-ease), visibility 0s 240ms; white-space: nowrap; }
@@ -32,16 +32,16 @@
 .sidebar-menu.is-active span { color: #174e39; }
 .sidebar-menu:hover,.sidebar-toggle:hover { background: #f3f8f4; }
 .sidebar-settings { position: absolute; left: 8px; bottom: 38px; width: 48px; margin: 0; }
-.sidebar--expanded { width: 232px; }
-.sidebar--expanded .sidebar-brand { top: 19px; left: 18px; width: 149px; height: 98.47px; }
-.sidebar--expanded .sidebar-toggle { top: 96px; left: 179px; width: 36px; background: #f3f8f4; }
-.sidebar--expanded .sidebar-profile { top: 158px; left: 20px; }
+.sidebar--expanded { width: var(--sidebar-expanded-width); }
+.sidebar--expanded .sidebar-brand { top: 18px; left: calc((var(--sidebar-expanded-width) - 134.1px) / 2); width: 134.1px; height: 88.62px; }
+.sidebar--expanded .sidebar-toggle { top: 12px; left: calc(var(--sidebar-expanded-width) - 46px); width: 34px; background: #f3f8f4; }
+.sidebar--expanded .sidebar-profile { top: 122px; left: 20px; }
 .sidebar--expanded nav { top: 219px; left: 11px; right: 11px; }
 .sidebar--expanded .sidebar-menu { justify-content: flex-start; padding-left: 17px; height: 47px; margin-bottom: 10px; border-radius: 11px; }
-.sidebar--expanded .sidebar-settings { bottom: 34px; left: 11px; width: 210px; margin: 0; }
+.sidebar--expanded .sidebar-settings { bottom: 34px; left: 11px; width: calc(var(--sidebar-expanded-width) - 22px); margin: 0; }
 .sidebar-settings::before { content: ''; position: absolute; top: -9px; left: 7px; right: 7px; height: 1px; background: #e2ebe5; opacity: 0; transition: opacity 240ms ease; }
 .sidebar--expanded .sidebar-settings::before { opacity: 1; }
-.sidebar-scrim { position: fixed; z-index: 30; inset: 0 0 0 232px; background: #102b1d24; cursor: default; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 320ms ease, visibility 0s 480ms; }
+.sidebar-scrim { position: fixed; z-index: 30; inset: 0 0 0 var(--sidebar-expanded-width); background: #102b1d24; cursor: default; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 320ms ease, visibility 0s 480ms; }
 .sidebar-scrim.is-visible { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 400ms ease, visibility 0s; }
 .workspace-content { margin-left: 64px; }
 .workspace-top { height: 94px; padding: 0 78px 0 40px; display: flex; align-items: flex-start; justify-content: space-between; }
@@ -132,3 +132,14 @@
   .recent-slide i:nth-child(2) { width: 54px; }
   .recent-info h3 { line-height: 1.6; }
 }
+
+/* Animated wrappers remain grid items; cards keep their original full width. */
+.create-grid > div > .create-card, .recent-grid > div > .recent-card { width: 100%; }
+
+.sidebar-toggle[hidden] { display: none; }
+
+/* A useful shortcut occupies the space freed above the unchanged menu. */
+.sidebar-quick-search { position: absolute; top: 178px; left: 18px; width: calc(var(--sidebar-expanded-width) - 36px); height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 9px; border-radius: 7px; color: #6c8276; background: #f3f8f4; font-size: 11px; text-align: left; }
+.sidebar-quick-search svg { width: 15px; height: 15px; flex-shrink: 0; }
+.sidebar-quick-search kbd { margin-left: auto; font: inherit; font-size: 10px; color: #83968a; }
+.sidebar-quick-search:hover { background: #e6f4ec; color: #174e39; }

@@ -26,3 +26,10 @@
   .landing .eyebrow { min-width: 0; }
 }
 @media(max-width:380px) { .wordmark span { max-width: 76px; } }
+/* Route changes focus the title for screen readers without a visual focus box. */
+h1[tabindex="-1"]:focus { outline: none; }
+
+/* Keep the magnetic field around the button, excluding its top spacing. */
+.landing-cta-magnet { margin-top: 47px; }
+.landing-cta-magnet .cta { margin-top: 0; }
+@media(max-width:768px) { .landing-cta-magnet { margin-top: 34px; } }
