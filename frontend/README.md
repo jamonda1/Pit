@@ -43,3 +43,24 @@ Penpot PIT 파일 `64ee36db-f4d2-8047-8008-dc149baa5147`의 랜딩/홈 두 상�
 React Bits의 AnimatedContent (TypeScript/Tailwind) 컴포넌트와 GSAP/ScrollTrigger를 사용합니다. 랜딩은 진입 시 문구→설명→CTA 순서로, 홈은 화면에 들어오는 카드별로 한 번씩 위로 이동하며 나타납니다. 기존 사이드바 전환은 유지합니다. 모션 감소 설정 시 콘텐츠는 바로 표시됩니다. React Bits 라이선스는 `public/licenses/react-bits-LICENSE.md`에 포함했습니다.
 
 랜딩 CTA에는 React Bits Magnet을 적용했습니다(반응 범위 150px, 이동 제한 12px, damping 20, tilt 7, scale 1.1). 터치/정밀 포인터 미지원 및 모션 감소 환경에서는 비활성화됩니다. 펼친 사이드바에는 접기 버튼이 없으며 바깥 클릭/Escape로 닫습니다. 펼치기 시 로고 버튼, 닫기 시 펼치기 버튼으로 포커스를 옮깁니다.
+
+
+## PitLoading
+
+`/loading-preview`에서 중앙 애니메이션, 크기 변경, 재생/일시 정지를 확인합니다.
+
+```jsx
+import PitLoading from './components/PitLoading'
+
+// 비동기 작업의 실제 로딩 상태에 연결합니다.
+return isLoading ? <PitLoading size={180} label="프레젠테이션을 불러오는 중" /> : <Content />
+```
+
+- `size`: 너비(px 숫자 또는 CSS 길이), 기본 180. 높이는 원본 540:357 비율입니다. 이미지 자체의 투명 여백도 유지합니다.
+- `speed`: 기본 1에서 왕복 2666.67ms, 2에서 두 배속입니다.
+- `paused`: 기본 false. 정지 시 현재 형태를 유지하며, 재생 시 그 위치부터 이어갑니다.
+- `label`, `className`, `style`, `onError`: 접근성 이름, 외형, 이미지 로드 오류 처리를 지정합니다.
+- 시스템 모션 감소 설정에서는 완성 로고를 정지 표시하며 설정 변경을 반영합니다.
+- 언마운트 시 프레임 요청과 이벤트를 정리합니다. 여러 인스턴스는 독립적으로 동작합니다.
+
+실제 원본은 루트 `assets/loading_motion.html`에 있으며 변경하지 않습니다. `src/assets/animations/`의 WebP 두 개는 원본 내장 데이터를 그대로 추출했습니다. `pitMotion.js`는 57프레임, 44–48 보정, 보간/타이밍 곡선, 조명/흐름 효과를 유지합니다. 미리보기 배경과 컨트롤은 컴포넌트에 포함하지 않습니다. JSX 컴포넌트는 TypeScript 사용을 위한 `PitLoading.d.ts`와 함께 제공합니다.

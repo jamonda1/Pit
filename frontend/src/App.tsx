@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { PitLoadingExample } from './pages/PitLoadingExample'
 import Magnet from './components/Magnet'
 import AnimatedContent from './components/AnimatedContent'
 import { HomePage } from './pages/HomePage'
@@ -39,5 +40,6 @@ export default function App() {
     document.title = path === '/home' ? '홈 — PIT' : 'PIT — Present It Together'
     document.querySelector<HTMLElement>('h1')?.focus({ preventScroll: true })
   }, [path])
+  if (path === '/loading-preview') return <PitLoadingExample />
   return path === '/home' ? <HomePage onLanding={() => navigate('/')} /> : <LandingPage onStart={() => navigate('/home')} />
 }
