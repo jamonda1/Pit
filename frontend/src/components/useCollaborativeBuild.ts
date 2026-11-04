@@ -259,6 +259,15 @@ export function useCollaborativeBuild() {
     // Changing the OS preference during construction reveals a usable static page.
     const onMotion = () => { if (motion.matches) revealAll() }
     motion.addEventListener('change', onMotion)
+    // Text construction temporarily reserves pixel widths. Release them before
+    // a different breakpoint reflows the page, including split-screen resizing.
+    const viewportWidth = innerWidth
+    const onResize = () => { if (innerWidth !== viewportWidth) revealAll() }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') revealAll()
+    }
+    window.addEventListener('resize', onResize)
+    window.addEventListener('keydown', onKeyDown)
     return () => {
       disposed = true
       observer?.disconnect()
@@ -267,6 +276,8 @@ export function useCollaborativeBuild() {
       frames.forEach(cancelAnimationFrame)
       restorations.forEach(restore => restore())
       motion.removeEventListener('change', onMotion)
+      window.removeEventListener('resize', onResize)
+      window.removeEventListener('keydown', onKeyDown)
     }
   }, [])
 
