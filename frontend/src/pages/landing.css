@@ -209,7 +209,7 @@
   background:var(--mint);
   border-radius:40px;
 }
-.hero-orb {
+.workspace-orb {
   position:absolute;
   border-radius:50%;
 }
@@ -414,14 +414,14 @@
   color:#244e3e;
   margin-top:10px;
 }
-.section-heading {
+.pit-section-heading {
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:48px;
   margin-top:28px;
 }
-.section-heading>p {
+.pit-section-heading>p {
   font-size:16px;
   line-height:1.65;
   max-width:480px;
@@ -436,7 +436,7 @@
 .pit-why .pit-kicker {
   color:#b9d4c4;
 }
-.pit-why .section-heading p {
+.pit-why .pit-section-heading p {
   color:#c7dec9;
 }
 .convergence-scene {
@@ -776,7 +776,7 @@
 .pit-team .pit-kicker {
   color:#bbd4c3;
 }
-.pit-team .section-heading>p {
+.pit-team .pit-section-heading>p {
   color:#bad4c4;
 }
 .team-deck {
@@ -1272,10 +1272,10 @@ only finished controls become interactive. */
   .landing-intro {
     background:linear-gradient(var(--paper) 0%,var(--paper) 76%,#e4f0e9 84%,#bcd6c9 93%,#6d998b 100%);
   }
-  .section-heading {
+  .pit-section-heading {
     display:block;
   }
-  .section-heading>p {
+  .pit-section-heading>p {
     margin-top:24px;
     max-width:none;
   }
@@ -1430,9 +1430,6 @@ only finished controls become interactive. */
     gap:15px;
     font-size:11px;
   }
-  .pit-header nav a:nth-child(2) {
-    display:none;
-  }
   .pit-header {
     height:78px;
   }
@@ -1540,10 +1537,10 @@ only finished controls become interactive. */
     padding-bottom:64px;
     background:linear-gradient(#6d998b 0%,var(--ink) 12%,var(--ink) 94%,#6d998b 100%);
   }
-  .section-heading {
+  .pit-section-heading {
     margin-top:24px;
   }
-  .section-heading>p {
+  .pit-section-heading>p {
     font-size:14px;
     margin-top:22px;
   }
@@ -1947,3 +1944,75 @@ only finished controls become interactive. */
 .builder-worker.builder-5 { --selection: #A17C20; }
 .builder-worker.builder-6 { --selection: #249DAC; }
 .builder-worker .builder-cursor > .presence { color: var(--selection); }
+
+/* Selection frames remain part of the finished collaborative slide artwork. */
+.preview-selection {
+  --selection-color: #11976e;
+  position: relative;
+  outline: 1px solid var(--selection-color);
+  outline-offset: 7px;
+}
+.preview-selection::before,
+.preview-selection::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: var(--paper);
+  border: 1px solid var(--selection-color);
+}
+.preview-selection::before { left: -10px; top: -10px; }
+.preview-selection::after { right: -10px; bottom: -10px; }
+.deck-slide-1 .preview-selection,
+.composed-slide .preview-selection { --selection-color: #8d76d1; }
+.composed-slide > .preview-selection { width: 60%; }
+.pit-landing #main:focus { outline: none; }
+.pit-header nav a { display: inline-flex; align-items: center; min-height: 44px; white-space: nowrap; }
+
+/* Match the 1440px source frame using content flow, leaving narrow screens fluid. */
+@media (min-width: 1201px) {
+  .landing-intro { min-height: 860px; padding-bottom: 56px; }
+  .pit-hero {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    min-height: 576px;
+    padding-bottom: 0;
+    align-items: start;
+  }
+  .hero-story { padding-top: 12px; }
+  .hero-story h1 { font-size: 52px; margin-top: 36px; }
+  .pit-hero .pit-lead { line-height: 1.3; }
+  .hero-actions { margin-top: 56px; }
+  .hero-workspace { aspect-ratio: 1.312; margin-block: 0; }
+  .pit-values > h2 { margin-top: 16px; }
+  .pit-section-heading { align-items: flex-end; }
+  .pit-why { min-height: 860px; padding-block: 60px 95px; }
+  .pit-why h2 { font-size: 41px; }
+  .convergence-scene { gap: 32px; margin-top: 102px; min-height: 410px; }
+  .scattered-files { height: 410px; }
+  .loose-file-0 { top: 8px; }
+  .shared-workspace { min-height: 410px; }
+  .scene-caption { margin-top: 20px !important; }
+  .pit-creative { min-height: 1120px; padding-block: 80px 66px; }
+  .pit-creative h2 { font-size: 48px; }
+  .creative-studio { margin-top: 45px; }
+  .pit-team { min-height: 950px; padding-block: 61px 141px; }
+  .pit-team h2 { font-size: 51px; }
+  .team-deck { gap: 32px; margin-top: 128px; }
+  .pit-how { min-height: 780px; padding-block: 95px 108px; }
+  .pit-how h2 { font-size: 43px; margin-top: 18px; }
+  .pit-how > .pit-container > .pit-lead { margin-top: 15px; line-height: 1.3; }
+  .how-layout { margin-top: 46px; }
+  .pit-faq { min-height: 590px; }
+}
+@media (max-width: 600px) {
+  .pit-header { gap: 12px; }
+  .pit-header nav { gap: 12px; }
+  .idea-note { left: 5%; width: 44%; padding: 10px; }
+  .idea-note strong { font-size: clamp(14px, 4vw, 18px); }
+  .composed-slide > .preview-selection { width: 88%; font-size: clamp(20px, 5.6vw, 26px); }
+  .composed-bars { top: 49%; height: 32%; }
+  .preview-selection { outline-offset: 4px; }
+  .preview-selection::before { left: -7px; top: -7px; }
+  .preview-selection::after { right: -7px; bottom: -7px; }
+}
