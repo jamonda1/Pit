@@ -7,11 +7,17 @@ on:
   # develop 또는 main 브랜치에 Push하면 실행
   push:
     branches: [develop, main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
 
   # develop 또는 main을 대상으로 PR을 생성하거나
   # 새로운 커밋을 Push하면 실행
   pull_request:
     branches: [develop, main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
 
 # GitHub Actions에 부여할 권한
 permissions:
