@@ -3,6 +3,13 @@ import { useLayoutEffect, useRef, useState } from 'react'
 const BUILD_SPEED = 1.5
 const buildMs = (ms: number) => ms / BUILD_SPEED
 const POINTER_FOLLOW = 1 - (1 - .32) ** BUILD_SPEED
+const VISIT_KEY = 'pit.landing.intro-seen.v1'
+const hasSeenIntro = () => {
+  try { return localStorage.getItem(VISIT_KEY) === 'true' } catch { return false }
+}
+const rememberIntro = () => {
+  try { localStorage.setItem(VISIT_KEY, 'true') } catch { /* Animation works without storage. */ }
+}
 
 /** A shared worker pool lets independent elements finish independently. */
 export function useCollaborativeBuild() {
@@ -10,10 +17,16 @@ export function useCollaborativeBuild() {
   const stop = useRef<() => void>(() => {})
   const [ready, setReady] = useState<Set<string>>(new Set())
   const [active, setActive] = useState(true)
+  const [returning] = useState(hasSeenIntro)
+  const [run, setRun] = useState(0)
 
   useLayoutEffect(() => {
     const host = root.current
     if (!host) return
+    setReady(new Set())
+    setActive(true)
+    const shortIntro = returning && run === 0
+    host.dataset.visit = shortIntro ? 'returning' : 'full'
     host.style.setProperty('--build-speed', String(BUILD_SPEED))
     let disposed = false
     let skipped = false
@@ -23,7 +36,6 @@ export function useCollaborativeBuild() {
     const timers = new Set<ReturnType<typeof setTimeout>>()
     const animations = new Set<Animation>()
     const queue: HTMLElement[] = []
-    const observed = new Set<Element>()
     const cursors = [...host.querySelectorAll<HTMLElement>('.builder-cursor')]
     const workerCount = innerWidth < 640 ? 3 : innerWidth < 1000 ? 5 : 7
     const workers = cursors.slice(0, workerCount).map(cursor => ({
@@ -230,11 +242,13 @@ export function useCollaborativeBuild() {
       }
       const busy = queue.length > 0 || workers.some(w => w.busy)
       setActive(busy)
-      if (!busy && observed.size === scenes.length) host!.dataset.motion = 'complete'
+      if (!busy) {
+        host!.dataset.motion = 'complete'
+        rememberIntro()
+      }
     }
     const revealAll = () => {
       skipped = true
-      observer?.disconnect()
       animations.forEach(a => a.cancel())
       frames.forEach(cancelAnimationFrame)
       restorations.forEach(restore => restore())
@@ -243,23 +257,29 @@ export function useCollaborativeBuild() {
       parts.forEach(el => { complete(el); delete el.dataset.building })
       host.dataset.motion = 'complete'
       setActive(false)
+      rememberIntro()
     }
-    let observer: IntersectionObserver | undefined
     stop.current = revealAll
     parts.forEach(el => { delete el.dataset.built; delete el.dataset.building; el.inert = true })
     host.dataset.motion = 'building'
-    if (motion.matches || !('IntersectionObserver' in window)) revealAll()
+    if (motion.matches || shortIntro) {
+      revealAll()
+      if (shortIntro && !motion.matches) {
+        const intro = host.querySelector('.landing-intro')
+        if (intro) void play(intro, [
+          { opacity: .65, transform: 'translateY(6px)' },
+          { opacity: 1, transform: 'translateY(0)' },
+        ], 320)
+      }
+    }
     else {
-      observer = new IntersectionObserver(entries => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting || observed.has(entry.target)) continue
-          observed.add(entry.target)
-          queue.push(...[...entry.target.querySelectorAll<HTMLElement>('[data-build]')].sort((a, b) => Number(a.dataset.priority ?? 10) - Number(b.dataset.priority ?? 10)))
-          observer?.unobserve(entry.target)
-        }
-        pump()
-      }, { threshold: .08, rootMargin: '0px 0px -20px 0px' })
-      scenes.forEach(scene => observer!.observe(scene))
+      // All scenes share one continuous queue, including those below the fold.
+      // Keep scene order, while independent workers build its elements in parallel.
+      for (const scene of scenes) {
+        queue.push(...[...scene.querySelectorAll<HTMLElement>('[data-build]')]
+          .sort((a, b) => Number(a.dataset.priority ?? 10) - Number(b.dataset.priority ?? 10)))
+      }
+      pump()
     }
     // Changing the OS preference during construction reveals a usable static page.
     const onMotion = () => { if (motion.matches) revealAll() }
@@ -275,7 +295,6 @@ export function useCollaborativeBuild() {
     window.addEventListener('keydown', onKeyDown)
     return () => {
       disposed = true
-      observer?.disconnect()
       timers.forEach(clearTimeout)
       animations.forEach(a => a.cancel())
       frames.forEach(cancelAnimationFrame)
@@ -284,9 +303,12 @@ export function useCollaborativeBuild() {
       window.removeEventListener('resize', onResize)
       window.removeEventListener('keydown', onKeyDown)
     }
-  }, [])
+  }, [returning, run])
 
-  return { root, ready, active, skip: () => {
+  return { root, ready, active, replay: () => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+    setRun(previous => previous + 1)
+  }, skip: () => {
     stop.current()
     root.current?.querySelector<HTMLElement>('h1')?.focus({ preventScroll: true })
   } }

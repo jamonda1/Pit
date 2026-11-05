@@ -10,9 +10,8 @@ export function Bars({ className = '' }: { className?: string }) {
 export function DeckSlide({ chapter }: { chapter: 0 | 1 | 2 }) {
   return <div className={`deck-slide deck-slide-${chapter}`}>
     <span className="slide-chapter">0{chapter + 1} / {['CONTEXT', 'EVIDENCE', 'DIRECTION'][chapter]}</span>
-    <strong className="preview-selection">{chapter === 0 ? <>우리가 바꾸려는<br />작은 불편함.</> : chapter === 1 ? <>생각을 뒷받침하는<br />새로운 관점.</> : <>그래서, 다음은<br />함께 만듭니다.</>}</strong>
-    {chapter === 0 ? <small>서로의 경험에서 출발합니다.</small> : chapter === 1 ? <Bars /> : <div className="slide-direction" aria-hidden="true">↗</div>}
-    <Presence tone={chapter} />
+    <strong className="preview-copy">{chapter === 0 ? <>문제에서<br />출발하고.</> : chapter === 1 ? <>근거로<br />설득하고.</> : <>다음 행동으로<br />이어갑니다.</>}</strong>
+    {chapter === 0 ? <small>발표의 배경을 분명하게.</small> : chapter === 1 ? <Bars /> : <div className="slide-direction" aria-hidden="true">↗</div>}
   </div>
 }
 
@@ -30,7 +29,6 @@ export function HeroWorkspace() {
         <div className="canvas-rule" data-build="draw" />
         <div className="canvas-sculpture" data-build="draw" data-priority="5"><i /><b /></div>
         <span className="canvas-footer" data-build="type">OUR IDEAS, TOGETHER. <span>01 / 08</span></span>
-        <Presence className="editor-pointer-one" /><Presence className="editor-pointer-two" tone={1} /><Presence className="editor-pointer-three" tone={2} />
       </div>
     </div>
     <div className="editor-comment" data-build="place">민서 · 이 방향 좋아요!<br /><span>다음 슬라이드도 이어서 만들어 볼게요.</span></div>
