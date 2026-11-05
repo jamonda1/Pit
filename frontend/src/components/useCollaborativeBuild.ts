@@ -3,6 +3,13 @@ import { useLayoutEffect, useRef, useState } from 'react'
 const BUILD_SPEED = 1.5
 const buildMs = (ms: number) => ms / BUILD_SPEED
 const POINTER_FOLLOW = 1 - (1 - .32) ** BUILD_SPEED
+const VISIT_KEY = 'pit.landing.intro-seen.v1'
+const hasSeenIntro = () => {
+  try { return localStorage.getItem(VISIT_KEY) === 'true' } catch { return false }
+}
+const rememberIntro = () => {
+  try { localStorage.setItem(VISIT_KEY, 'true') } catch { /* Animation works without storage. */ }
+}
 
 /** A shared worker pool lets independent elements finish independently. */
 export function useCollaborativeBuild() {
@@ -10,10 +17,16 @@ export function useCollaborativeBuild() {
   const stop = useRef<() => void>(() => {})
   const [ready, setReady] = useState<Set<string>>(new Set())
   const [active, setActive] = useState(true)
+  const [returning] = useState(hasSeenIntro)
+  const [run, setRun] = useState(0)
 
   useLayoutEffect(() => {
     const host = root.current
     if (!host) return
+    setReady(new Set())
+    setActive(true)
+    const shortIntro = returning && run === 0
+    host.dataset.visit = shortIntro ? 'returning' : 'full'
     host.style.setProperty('--build-speed', String(BUILD_SPEED))
     let disposed = false
     let skipped = false
@@ -229,7 +242,10 @@ export function useCollaborativeBuild() {
       }
       const busy = queue.length > 0 || workers.some(w => w.busy)
       setActive(busy)
-      if (!busy) host!.dataset.motion = 'complete'
+      if (!busy) {
+        host!.dataset.motion = 'complete'
+        rememberIntro()
+      }
     }
     const revealAll = () => {
       skipped = true
@@ -241,11 +257,21 @@ export function useCollaborativeBuild() {
       parts.forEach(el => { complete(el); delete el.dataset.building })
       host.dataset.motion = 'complete'
       setActive(false)
+      rememberIntro()
     }
     stop.current = revealAll
     parts.forEach(el => { delete el.dataset.built; delete el.dataset.building; el.inert = true })
     host.dataset.motion = 'building'
-    if (motion.matches) revealAll()
+    if (motion.matches || shortIntro) {
+      revealAll()
+      if (shortIntro && !motion.matches) {
+        const intro = host.querySelector('.landing-intro')
+        if (intro) void play(intro, [
+          { opacity: .65, transform: 'translateY(6px)' },
+          { opacity: 1, transform: 'translateY(0)' },
+        ], 320)
+      }
+    }
     else {
       // All scenes share one continuous queue, including those below the fold.
       // Keep scene order, while independent workers build its elements in parallel.
@@ -277,9 +303,12 @@ export function useCollaborativeBuild() {
       window.removeEventListener('resize', onResize)
       window.removeEventListener('keydown', onKeyDown)
     }
-  }, [])
+  }, [returning, run])
 
-  return { root, ready, active, skip: () => {
+  return { root, ready, active, replay: () => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+    setRun(previous => previous + 1)
+  }, skip: () => {
     stop.current()
     root.current?.querySelector<HTMLElement>('h1')?.focus({ preventScroll: true })
   } }

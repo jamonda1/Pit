@@ -1945,27 +1945,7 @@ only finished controls become interactive. */
 .builder-worker.builder-6 { --selection: #249DAC; }
 .builder-worker .builder-cursor > .presence { color: var(--selection); }
 
-/* Selection frames remain part of the finished collaborative slide artwork. */
-.preview-selection {
-  --selection-color: #11976e;
-  position: relative;
-  outline: 1px solid var(--selection-color);
-  outline-offset: 7px;
-}
-.preview-selection::before,
-.preview-selection::after {
-  content: '';
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  background: var(--paper);
-  border: 1px solid var(--selection-color);
-}
-.preview-selection::before { left: -10px; top: -10px; }
-.preview-selection::after { right: -10px; bottom: -10px; }
-.deck-slide-1 .preview-selection,
-.composed-slide .preview-selection { --selection-color: #8d76d1; }
-.composed-slide > .preview-selection { width: 60%; }
+.composed-slide > .preview-copy { width: 60%; }
 .pit-landing #main:focus { outline: none; }
 .pit-header nav a { display: inline-flex; align-items: center; min-height: 44px; white-space: nowrap; }
 
@@ -2010,11 +1990,8 @@ only finished controls become interactive. */
   .pit-header nav { gap: 12px; }
   .idea-note { left: 5%; width: 44%; padding: 10px; }
   .idea-note strong { font-size: clamp(14px, 4vw, 18px); }
-  .composed-slide > .preview-selection { width: 88%; font-size: clamp(20px, 5.6vw, 26px); }
+  .composed-slide > .preview-copy { width: 88%; font-size: clamp(20px, 5.6vw, 26px); }
   .composed-bars { top: 49%; height: 32%; }
-  .preview-selection { outline-offset: 4px; }
-  .preview-selection::before { left: -7px; top: -7px; }
-  .preview-selection::after { right: -7px; bottom: -7px; }
 }
 
 /* Before the desktop diagram gets cramped, give the connections vertical room. */
@@ -2060,6 +2037,20 @@ only finished controls become interactive. */
   .evidence-note > strong { font-size: 14px; }
   .evidence-note .pit-bars { height: 100px; }
   .composed-slide { left: 6%; top: auto; bottom: 28px; width: 88%; height: 275px; }
-  .composed-slide > .preview-selection { font-size: 30px; }
+  .composed-slide > .preview-copy { font-size: 30px; }
   .composed-body { font-size: 13px; }
 }
+
+/* After construction, only the content remains. Replay is always explicit. */
+.start-hint {
+  margin-top: 16px !important;
+  max-width: 520px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+.build-replay { opacity: .8; }
+.build-replay:hover { opacity: 1; }
+@media (max-width: 900px) { .start-hint { max-width: 420px; text-align: center; } }
+@media (max-width: 600px) { .start-hint { max-width: 290px; font-size: 11px; margin-top: 13px !important; } }

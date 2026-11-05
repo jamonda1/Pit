@@ -4,7 +4,7 @@ import { SceneConnections, fileConnections, ideaConnections } from '../component
 import './landing.css'
 
 export function LandingPage({ onStart }: { onStart: () => void }) {
-  const { root, ready, active, skip } = useCollaborativeBuild()
+  const { root, ready, active, skip, replay } = useCollaborativeBuild()
   return <div className="pit-landing" ref={root} data-motion="building">
     <a className="pit-skip" href="#main">본문으로 바로가기</a>
     <header className="pit-header pit-container" data-scene>
@@ -22,9 +22,10 @@ export function LandingPage({ onStart }: { onStart: () => void }) {
             <h1 id="landing-title" tabIndex={-1} data-build="type" data-priority="1">혼자 떠올린 생각이,<br /><em>함께 만드는 발표로.</em></h1>
             <p className="pit-lead" data-build="type" data-priority="2">파일은 하나로, 아이디어는 자유롭게.<br />PPTX를 올리고 팀원과 같은 화면에서 완성하세요.</p>
             <div className="hero-actions">
-              <button className="pit-start" data-build="draw" data-priority="3" data-build-id="hero-start" disabled={!ready.has('hero-start')} onClick={onStart}>PIT 시작하기</button>
+              <button className="pit-start" data-build="draw" data-priority="3" data-build-id="hero-start" aria-describedby="start-hint" disabled={!ready.has('hero-start')} onClick={onStart}>PIT 시작하기</button>
               <a href="#together" className="pit-text-link" data-build="type">어떻게 함께 만드나요? <span aria-hidden="true">↓</span></a>
             </div>
+            <p id="start-hint" className="start-hint" data-build="type">홈으로 이동해 새 자료 만들기·PPTX 가져오기를 선택하세요.</p>
           </div>
           <HeroWorkspace />
         </div>
@@ -42,7 +43,7 @@ export function LandingPage({ onStart }: { onStart: () => void }) {
           <div className="convergence-scene">
             <SceneConnections connections={fileConnections} />
             <div className="scattered-files">{[['최종_수정.pptx', '표지 수정', '지우의 수정본'], ['최종_진짜최종.pptx', '데이터 업데이트', '민서의 수정본'], ['최종_최종_v7.pptx', '이미지 교체', '도윤의 수정본']].map(([name, change, person], i) => <div className={`loose-file loose-file-${i}`} data-build="place" key={name}><strong>{name}</strong><span>{change}</span><small>{person}</small></div>)}</div>
-            <div className="shared-workspace" data-build="draw"><p className="pit-kicker">OUR SHARED SPACE</p><h3>팀의 다음 발표.pptx</h3><div className="mini-deck">{(['새로운 관점', '근거 있는 생각', '다음의 가능성']).map((v, i) => <div key={v}><span>0{i + 1} / {['THE IDEA', 'THE INSIGHT', 'WHAT’S NEXT'][i]}</span><strong>{v}</strong><i /></div>)}</div><p>흩어졌던 수정이, 하나의 흐름 안으로.</p><Presence /><Presence tone={1} /><Presence tone={2} /></div>
+            <div className="shared-workspace" data-build="draw"><p className="pit-kicker">OUR SHARED SPACE</p><h3>팀의 다음 발표.pptx</h3><div className="mini-deck">{(['새로운 관점', '근거 있는 생각', '다음의 가능성']).map((v, i) => <div key={v}><span>0{i + 1} / {['THE IDEA', 'THE INSIGHT', 'WHAT’S NEXT'][i]}</span><strong>{v}</strong><i /></div>)}</div><p>흩어졌던 수정이, 하나의 흐름 안으로.</p></div>
           </div>
           <p className="scene-caption" data-build="type">파일은 하나로. 팀의 생각은 한곳으로.</p>
         </div>
@@ -50,33 +51,33 @@ export function LandingPage({ onStart }: { onStart: () => void }) {
 
       <section id="together" className="pit-creative" data-scene>
         <div className="pit-container">
-          <p className="pit-kicker" data-build="type">02 / DIFFERENT IDEAS. BETTER TOGETHER.</p>
-          <h2 data-build="type">좋은 생각은,<br />다른 생각을 만나 자랍니다.</h2>
-          <p className="creative-aside" data-build="type">누군가는 문장을 다듬고, 누군가는 근거를 더하고.<br />각자의 기여가 한 장의 이야기가 됩니다.</p>
+          <p className="pit-kicker" data-build="type">02 / WORK IN PARALLEL</p>
+          <h2 data-build="type">같은 슬라이드에서,<br />각자의 작업을 동시에.</h2>
+          <p className="creative-aside" data-build="type">한 사람은 문장을, 다른 사람은 자료를.<br />서로의 작업을 보며 같은 화면에서 다듬습니다.</p>
           <div className="creative-studio">
             <div className="studio-surface" data-build="draw" /><p className="studio-label" data-build="type">THE MAKING OF A GOOD IDEA</p>
             <SceneConnections connections={ideaConnections} />
-            <div className="idea-note" data-build="place"><span>시작은 작은 질문</span><strong>우리의 다음은<br />어떤 모습일까?</strong><small>IDEA / 01</small><Presence /></div>
-            <div className="evidence-note" data-build="place"><strong>생각에 근거를 더하면</strong><Bars /><Presence tone={2} /></div>
+            <div className="idea-note" data-build="place"><span>제목 다듬기</span><strong>핵심 메시지부터<br />분명하게.</strong><small>IDEA / 01</small></div>
+            <div className="evidence-note" data-build="place"><strong>근거 더하기</strong><Bars /></div>
             <div className="composed-slide">
               <div className="composed-surface" data-build="draw" />
               <p className="slide-chapter" data-build="type">A SHARED PERSPECTIVE</p>
-              <strong className="preview-selection" data-build="type">생각을 연결하면,<br />가능성이 보입니다.</strong>
-              <p className="composed-body" data-build="type">작은 질문에 팀의 관점과 근거를 더해<br />다음 이야기를 함께 만들어갑니다.</p>
+              <strong className="preview-copy" data-build="type">문장과 근거를,<br />한 화면에서 다듬습니다.</strong>
+              <p className="composed-body" data-build="type">역할을 나눠 동시에 만들고,<br />수정한 내용을 함께 확인하세요.</p>
               <div className="composed-bars" data-build="draw"><i /><i /><i /></div>
-              <span className="composed-footer" data-build="type">OUR NEXT CHAPTER</span><Presence tone={1} />
+              <span className="composed-footer" data-build="type">EDIT TOGETHER</span>
             </div>
           </div>
-          <h3 className="creative-equation" data-build="type">질문 + 근거 + 서로의 관점</h3><p className="pit-lead" data-build="type">정답을 나누는 대신, 더 나은 답을 함께 만드는 공간.</p>
+          <h3 className="creative-equation" data-build="type">문장 · 데이터 · 디자인, 동시에</h3><p className="pit-lead" data-build="type">수정본을 보내는 대신, 같은 자료에서 바로 이어갑니다.</p>
         </div>
       </section>
 
       <section className="pit-team" data-scene>
-        <div className="pit-container"><p className="pit-kicker" data-build="type">03 / MANY HANDS. ONE STORY.</p>
-          <div className="pit-section-heading"><h2 data-build="type">각자 맡은 한 장.<br />함께 만드는 한 편.</h2><p data-build="type">각자의 작업이 따로 끝나지 않도록.<br />처음부터 같은 발표 안에서 만들어갑니다.</p></div>
+        <div className="pit-container"><p className="pit-kicker" data-build="type">03 / ONE COHERENT PRESENTATION</p>
+          <div className="pit-section-heading"><h2 data-build="type">합치는 수고는 줄이고,<br />발표의 흐름은 하나로.</h2><p data-build="type">내용을 옮겨 붙이는 마지막 작업을 줄이고,<br />앞뒤가 이어지는 발표 자료를 완성하세요.</p></div>
           <div className="team-deck">{([0, 1, 2] as const).map(chapter => <div data-build="place" key={chapter}><DeckSlide chapter={chapter} /></div>)}</div>
           <div className="deck-spine" data-build="draw"><i /></div>
-          <p className="team-conclusion" data-build="type">서로 다른 기여가 만나는,<br className="mobile-break" /> 하나의 프레젠테이션.</p>
+          <p className="team-conclusion" data-build="type">마지막에 합치기보다,<br className="mobile-break" /> 처음부터 하나의 발표로.</p>
         </div>
       </section>
 
@@ -85,7 +86,7 @@ export function LandingPage({ onStart }: { onStart: () => void }) {
           <div className="how-layout"><div className="file-to-team">
             <div className="how-surface" data-build="draw" />
             <div className="source-pptx" data-build="place"><span>PPTX</span><strong>우리의<br />다음 발표</strong><small>가져온 자료에서 이어가기</small></div>
-            <div className="destination-slide" data-build="place"><span>TOGETHER</span><strong>다음 이야기를<br />함께 쓰세요.</strong><small>ONE FILE. SHARED POSSIBILITIES.</small><Presence tone={1} /></div>
+            <div className="destination-slide" data-build="place"><span>TOGETHER</span><strong>다음 이야기를<br />함께 쓰세요.</strong><small>ONE FILE. SHARED POSSIBILITIES.</small></div>
             <p data-build="type">내 자료에서, 우리의 작업으로.</p>
           </div>
             <ol className="how-steps">{[['자료를 가져오세요', '작업하던 PPTX에서 시작하세요.'], ['함께할 팀원을 초대하세요', '하나의 작업 공간에 모이세요.'], ['같은 화면에서 완성하세요', '각자의 생각을 더하며 다듬으세요.']].map(([title, description], i) => <li data-build="type" key={title}><span>0{i + 1}</span><div><h3>{title}</h3><p>{description}</p></div></li>)}</ol>
@@ -105,6 +106,6 @@ export function LandingPage({ onStart }: { onStart: () => void }) {
     </main>
 
     <div className="builder-overlay" aria-hidden="true">{Array.from({ length: 7 }, (_, i) => <div className={`builder-worker builder-${i}`} key={i}><div className="builder-target"><i className="edit-caret" />{Array.from({ length: 8 }, (_, handle) => <i className={`selection-handle handle-${handle}`} key={handle} />)}</div><div className="builder-cursor"><Presence /></div></div>)}</div>
-    {active && <button className="build-skip" onClick={skip}>애니메이션 건너뛰기 <span aria-hidden="true">↗</span></button>}
+    <div className="build-controls">{active ? <button className="build-skip" onClick={skip}>애니메이션 건너뛰기 <span aria-hidden="true">↗</span></button> : <button className="build-skip build-replay" onClick={replay}>제작 과정 다시 보기 <span aria-hidden="true">↻</span></button>}</div>
   </div>
 }
