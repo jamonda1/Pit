@@ -1082,7 +1082,7 @@ only finished controls become interactive. */
   width:26px;
   height:34px;
   opacity:0;
-  transition:opacity .16s;
+  transition:opacity calc(160ms / var(--build-speed, 1));
   will-change:transform;
 }
 .builder-cursor>.presence {
@@ -1870,7 +1870,7 @@ only finished controls become interactive. */
   opacity: 0;
   box-shadow: 0 0 0 1px #FFFFFF50;
   pointer-events: none;
-  transition: opacity 120ms;
+  transition: opacity calc(120ms / var(--build-speed, 1));
 }
 .builder-target[data-mode="text"] {
   border-style: dashed;
@@ -1899,7 +1899,7 @@ only finished controls become interactive. */
   position: absolute;
   width: 2px;
   background: var(--selection);
-  animation: editing-caret 650ms step-end infinite;
+  animation: editing-caret calc(650ms / var(--build-speed, 1)) step-end infinite;
 }
 @keyframes editing-caret { 50% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {

@@ -1,5 +1,9 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 
+const BUILD_SPEED = 1.5
+const buildMs = (ms: number) => ms / BUILD_SPEED
+const POINTER_FOLLOW = 1 - (1 - .32) ** BUILD_SPEED
+
 /** A shared worker pool lets independent elements finish independently. */
 export function useCollaborativeBuild() {
   const root = useRef<HTMLDivElement>(null)
@@ -10,6 +14,7 @@ export function useCollaborativeBuild() {
   useLayoutEffect(() => {
     const host = root.current
     if (!host) return
+    host.style.setProperty('--build-speed', String(BUILD_SPEED))
     let disposed = false
     let skipped = false
     const motion = matchMedia('(prefers-reduced-motion: reduce)')
@@ -50,7 +55,7 @@ export function useCollaborativeBuild() {
         nodes.push({ node: current as Text, text, chars: Array.from(text) })
       }
       const count = nodes.reduce((sum, entry) => sum + entry.chars.length, 0)
-      const duration = Math.min(1900, Math.max(900, count * 24))
+      const duration = buildMs(Math.min(1900, Math.max(900, count * 24)))
       const r = el.getBoundingClientRect()
       const original = { minHeight: el.style.minHeight, minWidth: el.style.minWidth, opacity: el.style.opacity }
       el.style.minHeight = `${r.height}px`
@@ -141,7 +146,7 @@ export function useCollaborativeBuild() {
       await play(worker.cursor, [
         { transform: worker.cursor.style.transform || transform(inCanvas(innerWidth * (index + 1) / (workerCount + 1), innerHeight * .45)) },
         { transform: transform(start) },
-      ], 340 + index * 35)
+      ], buildMs(340 + index * 35))
       if (disposed || skipped) return
       worker.cursor.style.transform = transform(start)
       el.dataset.building = 'true'
@@ -157,7 +162,7 @@ export function useCollaborativeBuild() {
         selection.style.width = `${r.width + 12}px`
         selection.style.height = `${r.height + 12}px`
       })
-      const duration = el.dataset.build === 'draw' ? 950 : 850
+      const duration = buildMs(el.dataset.build === 'draw' ? 950 : 850)
       const keyframes: Keyframe[] = el.dataset.build === 'draw'
           ? [{ opacity: .3, clipPath: 'inset(0 90% 80% 0)' }, { opacity: 1, clipPath: 'inset(0 0 0 0)' }]
           : [{ opacity: 0, transform: 'translate3d(14px,18px,0) scale(.96)' }, { opacity: 1, transform: 'translate3d(0,0,0) scale(1)' }]
@@ -167,7 +172,7 @@ export function useCollaborativeBuild() {
         const dx = target.x - pointer.x
         const dy = target.y - pointer.y
         // Follow each keystroke with a small trailing motion, including line wraps.
-        pointer = { x: pointer.x + dx * .32, y: pointer.y + dy * .32 }
+        pointer = { x: pointer.x + dx * POINTER_FOLLOW, y: pointer.y + dy * POINTER_FOLLOW }
         const tilt = Math.max(-7, Math.min(7, dx * .13))
         worker.cursor.style.transform = `${transform(pointer)} rotate(${tilt}deg)`
       }
@@ -177,7 +182,7 @@ export function useCollaborativeBuild() {
         await sleep(text.duration)
         text.stopFollowing()
         text.finish()
-        if (!disposed && !skipped) await sleep(240)
+        if (!disposed && !skipped) await sleep(buildMs(240))
         text.restore()
       } else {
         worker.cursor.dataset.action = el.dataset.build === 'draw' ? 'drawing' : 'dragging'
@@ -203,7 +208,7 @@ export function useCollaborativeBuild() {
           const restoreOpacity = () => { el.style.opacity = opacity; restorations.delete(restoreOpacity) }
           restorations.add(restoreOpacity)
           el.style.opacity = '1'
-          await sleep(180)
+          await sleep(buildMs(180))
           restoreOpacity()
         }
       }
@@ -213,7 +218,7 @@ export function useCollaborativeBuild() {
       if (disposed || skipped) return
       complete(el)
       delete el.dataset.building
-      await sleep(110)
+      await sleep(buildMs(110))
       worker.busy = false
       worker.cursor.style.opacity = '0'
       pump()
