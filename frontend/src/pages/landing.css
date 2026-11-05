@@ -2016,3 +2016,50 @@ only finished controls become interactive. */
   .preview-selection::before { left: -7px; top: -7px; }
   .preview-selection::after { right: -7px; bottom: -7px; }
 }
+
+/* Before the desktop diagram gets cramped, give the connections vertical room. */
+@media (min-width: 601px) and (max-width: 1100px) {
+  .convergence-scene {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 90px;
+    min-height: 0;
+    align-items: start;
+  }
+  .scattered-files {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: center;
+    gap: 24px;
+    height: auto;
+    min-height: 132px;
+  }
+  .loose-file {
+    position: relative;
+    width: 100%;
+    max-width: none;
+    padding: 17px 14px;
+    gap: 6px;
+  }
+  .loose-file-0, .loose-file-1, .loose-file-2 { left: auto; top: auto; }
+  .loose-file strong { font-size: clamp(12px, 1.6vw, 16px); overflow-wrap: anywhere; }
+  .loose-file span { font-size: 12px; }
+  .loose-file small { font-size: 10px; }
+  .shared-workspace { width: 100%; max-width: 760px; justify-self: center; padding: 26px; }
+  .shared-workspace h3 { font-size: 26px; }
+  .mini-deck { gap: 14px; }
+  .mini-deck > div { min-height: 126px; padding: 16px 12px; }
+  .mini-deck strong { font-size: 15px; }
+  .mini-deck span { font-size: 9px; }
+}
+@media (min-width: 601px) and (max-width: 800px) {
+  .creative-studio { aspect-ratio: auto; height: 600px; }
+  .studio-label { top: 24px; left: 24px; }
+  .idea-note { left: 7%; top: 80px; width: 36%; height: 165px; padding: 18px; }
+  .idea-note strong { font-size: 24px; }
+  .evidence-note { left: auto; right: 7%; top: 85px; bottom: auto; width: 36%; height: 160px; padding: 18px; }
+  .evidence-note > strong { font-size: 14px; }
+  .evidence-note .pit-bars { height: 100px; }
+  .composed-slide { left: 6%; top: auto; bottom: 28px; width: 88%; height: 275px; }
+  .composed-slide > .preview-selection { font-size: 30px; }
+  .composed-body { font-size: 13px; }
+}

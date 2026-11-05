@@ -23,7 +23,6 @@ export function useCollaborativeBuild() {
     const timers = new Set<ReturnType<typeof setTimeout>>()
     const animations = new Set<Animation>()
     const queue: HTMLElement[] = []
-    const observed = new Set<Element>()
     const cursors = [...host.querySelectorAll<HTMLElement>('.builder-cursor')]
     const workerCount = innerWidth < 640 ? 3 : innerWidth < 1000 ? 5 : 7
     const workers = cursors.slice(0, workerCount).map(cursor => ({
@@ -230,11 +229,10 @@ export function useCollaborativeBuild() {
       }
       const busy = queue.length > 0 || workers.some(w => w.busy)
       setActive(busy)
-      if (!busy && observed.size === scenes.length) host!.dataset.motion = 'complete'
+      if (!busy) host!.dataset.motion = 'complete'
     }
     const revealAll = () => {
       skipped = true
-      observer?.disconnect()
       animations.forEach(a => a.cancel())
       frames.forEach(cancelAnimationFrame)
       restorations.forEach(restore => restore())
@@ -244,22 +242,18 @@ export function useCollaborativeBuild() {
       host.dataset.motion = 'complete'
       setActive(false)
     }
-    let observer: IntersectionObserver | undefined
     stop.current = revealAll
     parts.forEach(el => { delete el.dataset.built; delete el.dataset.building; el.inert = true })
     host.dataset.motion = 'building'
-    if (motion.matches || !('IntersectionObserver' in window)) revealAll()
+    if (motion.matches) revealAll()
     else {
-      observer = new IntersectionObserver(entries => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting || observed.has(entry.target)) continue
-          observed.add(entry.target)
-          queue.push(...[...entry.target.querySelectorAll<HTMLElement>('[data-build]')].sort((a, b) => Number(a.dataset.priority ?? 10) - Number(b.dataset.priority ?? 10)))
-          observer?.unobserve(entry.target)
-        }
-        pump()
-      }, { threshold: .08, rootMargin: '0px 0px -20px 0px' })
-      scenes.forEach(scene => observer!.observe(scene))
+      // All scenes share one continuous queue, including those below the fold.
+      // Keep scene order, while independent workers build its elements in parallel.
+      for (const scene of scenes) {
+        queue.push(...[...scene.querySelectorAll<HTMLElement>('[data-build]')]
+          .sort((a, b) => Number(a.dataset.priority ?? 10) - Number(b.dataset.priority ?? 10)))
+      }
+      pump()
     }
     // Changing the OS preference during construction reveals a usable static page.
     const onMotion = () => { if (motion.matches) revealAll() }
@@ -275,7 +269,6 @@ export function useCollaborativeBuild() {
     window.addEventListener('keydown', onKeyDown)
     return () => {
       disposed = true
-      observer?.disconnect()
       timers.forEach(clearTimeout)
       animations.forEach(a => a.cancel())
       frames.forEach(cancelAnimationFrame)

@@ -1,5 +1,6 @@
 import { useCollaborativeBuild } from '../components/useCollaborativeBuild'
 import { Bars, DeckSlide, HeroWorkspace, Presence } from '../components/landing/PresentationPreview'
+import { SceneConnections, fileConnections, ideaConnections } from '../components/landing/SceneConnections'
 import './landing.css'
 
 export function LandingPage({ onStart }: { onStart: () => void }) {
@@ -39,7 +40,7 @@ export function LandingPage({ onStart }: { onStart: () => void }) {
           <p className="pit-kicker" data-build="type">01 / LESS PASSING. MORE MAKING.</p>
           <div className="pit-section-heading"><h2 data-build="type">파일을 주고받던 시간을,<br />함께 만드는 시간으로.</h2><p data-build="type">최신본을 찾고, 수정을 기다리고, 다시 합치는 대신.<br />팀의 작업이 만나는 하나의 공간을 만듭니다.</p></div>
           <div className="convergence-scene">
-            <svg className="connection-paths" viewBox="0 0 1300 440" preserveAspectRatio="none" aria-hidden="true" data-build="draw"><path d="M290 80C510 80 440 210 670 210M390 220H670M290 370C510 370 440 210 670 210" /></svg>
+            <SceneConnections connections={fileConnections} />
             <div className="scattered-files">{[['최종_수정.pptx', '표지 수정', '지우의 수정본'], ['최종_진짜최종.pptx', '데이터 업데이트', '민서의 수정본'], ['최종_최종_v7.pptx', '이미지 교체', '도윤의 수정본']].map(([name, change, person], i) => <div className={`loose-file loose-file-${i}`} data-build="place" key={name}><strong>{name}</strong><span>{change}</span><small>{person}</small></div>)}</div>
             <div className="shared-workspace" data-build="draw"><p className="pit-kicker">OUR SHARED SPACE</p><h3>팀의 다음 발표.pptx</h3><div className="mini-deck">{(['새로운 관점', '근거 있는 생각', '다음의 가능성']).map((v, i) => <div key={v}><span>0{i + 1} / {['THE IDEA', 'THE INSIGHT', 'WHAT’S NEXT'][i]}</span><strong>{v}</strong><i /></div>)}</div><p>흩어졌던 수정이, 하나의 흐름 안으로.</p><Presence /><Presence tone={1} /><Presence tone={2} /></div>
           </div>
@@ -54,7 +55,7 @@ export function LandingPage({ onStart }: { onStart: () => void }) {
           <p className="creative-aside" data-build="type">누군가는 문장을 다듬고, 누군가는 근거를 더하고.<br />각자의 기여가 한 장의 이야기가 됩니다.</p>
           <div className="creative-studio">
             <div className="studio-surface" data-build="draw" /><p className="studio-label" data-build="type">THE MAKING OF A GOOD IDEA</p>
-            <svg className="connection-paths" viewBox="0 0 1300 560" preserveAspectRatio="none" aria-hidden="true" data-build="draw"><path d="M260 230C380 230 390 280 530 280M310 440C430 440 420 350 530 350" /></svg>
+            <SceneConnections connections={ideaConnections} />
             <div className="idea-note" data-build="place"><span>시작은 작은 질문</span><strong>우리의 다음은<br />어떤 모습일까?</strong><small>IDEA / 01</small><Presence /></div>
             <div className="evidence-note" data-build="place"><strong>생각에 근거를 더하면</strong><Bars /><Presence tone={2} /></div>
             <div className="composed-slide">
