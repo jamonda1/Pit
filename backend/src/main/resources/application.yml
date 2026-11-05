@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: backend
+
+  # PostgreSQL 데이터베이스 연결 설정
+  datasource:
+    # 환경변수에서 DB 연결 정보를 가져옴
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+    # PostgreSQL JDBC 드라이버
+    driver-class-name: org.postgresql.Driver
