@@ -25,4 +25,17 @@
 
 ## Backend
 
-미구성. 백엔드 구축 후 CI/CD 추가 예정.
+### CI · GitHub Actions
+
+설정: [`backend-ci.yml`](./backend-ci.yml)
+
+- **실행 조건:** `develop`, `main` push 또는 해당 브랜치 대상 PR 생성·재열기·커밋 추가 시, `backend/**` 또는 `.github/workflows/backend-ci.yml` 변경이 있는 경우
+- **환경:** Ubuntu, Java 21 (Eclipse Temurin), Gradle Wrapper, 테스트용 PostgreSQL 17 / 작업 위치: `backend/`
+- **실행 순서:** 코드 체크아웃 → Java 21 설정 → Gradle 및 의존성 캐시 설정 → Gradle Wrapper 실행 권한 부여 → `./gradlew clean build --no-daemon`
+- **검증 범위:** Java 컴파일, 프로젝트에 작성된 테스트 실행 및 JAR 생성. 배포 단계 없음.
+- **실행 제어:** 동일한 PR·브랜치의 새 실행 시작 시 이전 실행 취소. 작업 시간 최대 10분.
+- **결과 확인:** GitHub Actions → Backend CI 또는 PR Checks. 실패 시 HTML 테스트 보고서가 있으면 `backend-test-report` 아티팩트로 보관.
+
+### CD
+
+미구현. CD 구현 완료 후 배포 절차 작성 예정.
