@@ -1,119 +1,125 @@
-
 # GitHub Actions에 표시될 워크플로 이름
 name: Backend CI
 
 # 워크플로 실행 조건
 on:
-  # develop 또는 main에 백엔드 관련 변경 사항을 Push하면 실행
-  push:
-    branches: [develop, main]
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend-ci.yml'
+    # develop 또는 main에 백엔드 관련 변경 사항을 Push하면 실행
+    push:
+        branches: [develop, main]
+        paths:
+            - 'backend/**'
+            - '.github/workflows/backend-ci.yml'
 
-  # develop 또는 main을 대상으로 PR을 생성하거나
-  # 새로운 커밋을 Push하면 실행
-  pull_request:
-    branches: [develop, main]
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend-ci.yml'
+    # develop 또는 main을 대상으로 PR을 생성하거나
+    # 새로운 커밋을 Push하면 실행
+    pull_request:
+        branches: [develop, main]
+        paths:
+            - 'backend/**'
+            - '.github/workflows/backend-ci.yml'
+
+# 동일한 PR 또는 브랜치의 새 실행이 시작되면 이전 실행 취소
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
 # GitHub Actions에 부여할 권한
 permissions:
-  # 저장소 코드를 읽을 수 있는 최소 권한만 부여
-  contents: read
+    # 저장소 코드를 읽을 수 있는 최소 권한만 부여
+    contents: read
 
 # 실행할 작업(Job) 정의
 jobs:
-  # 작업 식별자 (추후 필수 Status Check로 사용)
-  backend-build:
+    # 작업 식별자 (추후 필수 Status Check로 사용)
+    backend-build:
+        # GitHub에서 제공하는 Ubuntu 실행 환경
+        runs-on: ubuntu-latest
 
-    # GitHub에서 제공하는 Ubuntu 실행 환경
-    runs-on: ubuntu-latest
+        # 빌드가 멈춰도 작업이 10분을 초과하지 않도록 제한
+        timeout-minutes: 10
 
-    # CI 테스트에 필요한 PostgreSQL 컨테이너
-    services:
-      postgres:
-        # PostgreSQL 17 이미지 사용
-        image: postgres:17
+        # CI 테스트에 필요한 PostgreSQL 컨테이너
+        services:
+            postgres:
+                # PostgreSQL 17 이미지 사용
+                image: postgres:17
 
-        # CI 테스트 전용 DB 및 계정 설정
-        # 실제 운영 DB와는 무관한 임시 정보
+                # CI 테스트 전용 DB 및 계정 설정
+                # 실제 운영 DB와는 무관한 임시 정보
+                env:
+                    POSTGRES_DB: pit_test
+                    POSTGRES_USER: pit_test
+                    POSTGRES_PASSWORD: pit_test
+
+                # GitHub Actions 실행 환경에서 접근할 포트
+                ports:
+                    - 5432:5432
+
+                # PostgreSQL이 정상적으로 실행됐는지 확인
+                options: >-
+                    --health-cmd "pg_isready -U pit_test -d pit_test"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        # Spring Boot에서 사용할 DB 환경변수
+        # application.yml의 ${DB_URL} 등에 전달됨
         env:
-          POSTGRES_DB: pit_test
-          POSTGRES_USER: pit_test
-          POSTGRES_PASSWORD: pit_test
+            DB_URL: jdbc:postgresql://localhost:5432/pit_test
+            DB_USERNAME: pit_test
+            DB_PASSWORD: pit_test
 
-        # GitHub Actions 실행 환경에서 접근할 포트
-        ports:
-          - 5432:5432
+        # 이 작업의 run 명령어에 적용할 기본 설정
+        defaults:
+            run:
+                # 모든 run 명령어를 backend/ 디렉토리에서 실행
+                working-directory: backend
 
-        # PostgreSQL이 정상적으로 실행됐는지 확인
-        options: >-
-          --health-cmd "pg_isready -U pit_test -d pit_test"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+        # 작업 내부에서 순서대로 실행할 단계(Step)
+        steps:
+            # 1. GitHub 저장소 코드를 실행 환경으로 가져오기
+            - name: Checkout repository
+              uses: actions/checkout@v7
 
-    # Spring Boot에서 사용할 DB 환경변수
-    # application.yml의 ${DB_URL} 등에 전달됨
-    env:
-      DB_URL: jdbc:postgresql://localhost:5432/pit_test
-      DB_USERNAME: pit_test
-      DB_PASSWORD: pit_test
+            # 2. Spring Boot 프로젝트 빌드에 사용할 Java 21 설치
+            - name: Setup Java 21
+              uses: actions/setup-java@v6
+              with:
+                  # Eclipse Temurin OpenJDK 사용
+                  distribution: temurin
 
-    # 이 작업의 run 명령어에 적용할 기본 설정
-    defaults:
-      run:
-        # 모든 run 명령어를 backend/ 디렉토리에서 실행
-        working-directory: backend
+                  # build.gradle에 설정된 Java 버전과 일치
+                  java-version: '21'
 
-    # 작업 내부에서 순서대로 실행할 단계(Step)
-    steps:
-      # 1. GitHub 저장소 코드를 실행 환경으로 가져오기
-      - name: Checkout repository
-        uses: actions/checkout@v7
+            # 3. Gradle 실행 환경 및 의존성 캐시 설정
+            - name: Setup Gradle
+              uses: gradle/actions/setup-gradle@v6
+              with:
+                  # GitHub Actions 기반의 오픈소스 캐시 사용
+                  # 이후 실행 시 의존성 다운로드 시간을 단축
+                  cache-provider: basic
 
-      # 2. Spring Boot 프로젝트 빌드에 사용할 Java 21 설치
-      - name: Setup Java 21
-        uses: actions/setup-java@v6
-        with:
-          # Eclipse Temurin OpenJDK 사용
-          distribution: temurin
+            # 4. Linux 환경에서 Gradle Wrapper 실행 권한 부여
+            - name: Grant Gradle permission
+              run: chmod +x ./gradlew
 
-          # build.gradle에 설정된 Java 버전과 일치
-          java-version: '21'
+            # 5. PostgreSQL에 연결하여 빌드 및 테스트 검증
+            - name: Build backend
+              # clean: 기존 빌드 결과물 삭제
+              # build: 컴파일, 테스트 및 JAR 생성
+              # --no-daemon: 지속 실행되는 Gradle Daemon 사용 방지
+              run: ./gradlew clean build --no-daemon
 
-      # 3. Gradle 실행 환경 및 의존성 캐시 설정
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          # GitHub Actions 기반의 오픈소스 캐시 사용
-          # 이후 실행 시 의존성 다운로드 시간을 단축
-          cache-provider: basic
+            # 6. 테스트 실패 시 HTML 테스트 보고서 보관
+            - name: Upload test report
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  # GitHub Actions에서 다운로드할 보고서 이름
+                  name: backend-test-report
 
-      # 4. Linux 환경에서 Gradle Wrapper 실행 권한 부여
-      - name: Grant Gradle permission
-        run: chmod +x ./gradlew
+                  # Gradle 테스트 결과 보고서 위치
+                  path: backend/build/reports/tests/test/
 
-      # 5. PostgreSQL에 연결하여 빌드 및 테스트 검증
-      - name: Build backend
-        # clean: 기존 빌드 결과물 삭제
-        # build: 컴파일, 테스트 및 JAR 생성
-        # --no-daemon: 지속 실행되는 Gradle Daemon 사용 방지
-        run: ./gradlew clean build --no-daemon
-
-      # 6. 테스트 실패 시 HTML 테스트 보고서 보관
-      - name: Upload test report
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          # GitHub Actions에서 다운로드할 보고서 이름
-          name: backend-test-report
-
-          # Gradle 테스트 결과 보고서 위치
-          path: backend/build/reports/tests/test/
-
-          # 보고서가 없어도 별도 오류를 발생시키지 않음
-          if-no-files-found: ignore
+                  # 보고서가 없어도 별도 오류를 발생시키지 않음
+                  if-no-files-found: ignore
