@@ -1,3 +1,4 @@
+import { useAuth } from '../auth/AuthProvider'
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 
 export type TeamRole = 'OWNER' | 'ADMIN' | 'EDITOR' | 'VIEWER'
@@ -57,8 +58,10 @@ function readData(): WorkspaceData {
 }
 const Context = createContext<{ data: WorkspaceData; update: (change: (data: WorkspaceData) => WorkspaceData) => void } | null>(null)
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState(readData)
-  useEffect(() => { try { localStorage.setItem(storageKey, JSON.stringify(data)) } catch { /* Keep in-memory editing available. */ } }, [data])
+  const { status } = useAuth()
+  const [data, setData] = useState(() => structuredClone(initialData))
+  useEffect(() => { setData(status === 'authenticated' ? readData() : structuredClone(initialData)) }, [status])
+  useEffect(() => { if (status !== 'authenticated') return; try { localStorage.setItem(storageKey, JSON.stringify(data)) } catch { /* Keep in-memory editing available. */ } }, [data, status])
   return <Context.Provider value={{ data, update: setData }}>{children}</Context.Provider>
 }
 export function useWorkspaceData() {
