@@ -24,7 +24,8 @@ const productionAdapter: AuthAdapter = {
 }
 
 // Explicit UI preview only: no credentials, tokens, API calls, or account linking.
-// Development is enabled by default; hosted previews require VITE_AUTH_PREVIEW=true.
+// Development enables this by default. .env.production also enables the current hosted UI preview.
+// Set VITE_AUTH_PREVIEW=false in the deployment environment when real authentication is connected.
 const previewKey = 'pit.auth.preview.v1'
 const previewUser: AuthUser = { id: 'preview-user', nickname: '테스트 계정' }
 let previewLoggedIn = false
