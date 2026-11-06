@@ -1,3 +1,4 @@
+import { useAuth } from '../auth/AuthProvider'
 import { useEffect, useRef } from 'react'
 import { Icon } from './Icon'
 import { useWorkspaceData } from './workspaceData'
@@ -7,6 +8,7 @@ export function WorkspaceSwitcher({ open, onOpenChange, onNavigate }: {
   onOpenChange: (open: boolean) => void
   onNavigate: (path: string) => void
 }) {
+  const { requireAuth } = useAuth()
   const { data, update } = useWorkspaceData()
   const container = useRef<HTMLDivElement>(null)
   const personalName = `${data.nickname} 님의 개인 워크스페이스`
@@ -24,9 +26,12 @@ export function WorkspaceSwitcher({ open, onOpenChange, onNavigate }: {
     return () => { document.removeEventListener('pointerdown', dismiss); document.removeEventListener('keydown', escape) }
   }, [open, onOpenChange])
   const select = (workspace: 'personal' | 'team') => {
+    onOpenChange(false)
+    requireAuth('workspace', () => {
     update(previous => ({ ...previous, activeWorkspace: workspace }))
     onOpenChange(false)
     onNavigate(workspace === 'personal' ? '/home' : '/workspace')
+    })
   }
   return <div ref={container} className="workspace-selector">
     <span className="workspace-caption">WORKSPACE</span>

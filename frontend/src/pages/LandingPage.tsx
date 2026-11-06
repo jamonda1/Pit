@@ -22,10 +22,9 @@ export function LandingPage({ onStart }: { onStart: () => void }) {
             <h1 id="landing-title" tabIndex={-1} data-build="type" data-priority="1">혼자 떠올린 생각이,<br /><em>함께 만드는 발표로.</em></h1>
             <p className="pit-lead" data-build="type" data-priority="2">파일은 하나로, 아이디어는 자유롭게.<br />PPTX를 올리고 팀원과 같은 화면에서 완성하세요.</p>
             <div className="hero-actions">
-              <button className="pit-start" data-build="draw" data-priority="3" data-build-id="hero-start" aria-describedby="start-hint" disabled={!ready.has('hero-start')} onClick={onStart}>PIT 시작하기</button>
+              <button className="pit-start" data-build="draw" data-priority="3" data-build-id="hero-start" disabled={!ready.has('hero-start')} onClick={onStart}>PIT 시작하기</button>
               <a href="#together" className="pit-text-link" data-build="type">어떻게 함께 만드나요? <span aria-hidden="true">↓</span></a>
             </div>
-            <p id="start-hint" className="start-hint" data-build="type">홈으로 이동해 새 자료 만들기·PPTX 가져오기를 선택하세요.</p>
           </div>
           <HeroWorkspace />
         </div>

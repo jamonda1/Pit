@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useAuth } from '../auth/AuthProvider'
 import { Sidebar } from '../components/Sidebar'
 import { WorkspaceSwitcher } from '../components/WorkspaceSwitcher'
 import { Icon } from '../components/Icon'
@@ -39,6 +40,7 @@ function Collaborators({ initials }: { initials: string[] }) {
 }
 
 export function HomePage({ onNavigate }: { onNavigate: (path: string) => void }) {
+  const { requireAuth } = useAuth()
   const { data } = useWorkspaceData()
   const [expanded, setExpanded] = useState(false)
   const [query, setQuery] = useState('')
@@ -101,7 +103,7 @@ export function HomePage({ onNavigate }: { onNavigate: (path: string) => void })
     ? allDocuments.filter(item => `${item.name} ${getOwner(item.owner)}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
     : documents
   const closeSearch = () => { setSearchOpen(false); setQuery(''); document.getElementById('recent-title')?.focus() }
-  const previewDocument = (name: string) => setNotice(`${name}은 디자인 미리보기 자료입니다. 편집 기능은 준비 중입니다.`)
+  const previewDocument = (name: string) => requireAuth('document', () => setNotice(`${name}은 디자인 미리보기 자료입니다. 편집 기능은 준비 중입니다.`))
   const members = data.members.slice(0, 4).map(member => member.initial)
 
   return <div className="workspace">
@@ -109,15 +111,15 @@ export function HomePage({ onNavigate }: { onNavigate: (path: string) => void })
     <div className="workspace-content" inert={expanded}>
       <header className="workspace-top">
         <WorkspaceSwitcher open={workspaceOpen} onOpenChange={setWorkspaceOpen} onNavigate={onNavigate} />
-        <div className="workspace-account"><button className="notification-button" aria-label="알림" onClick={() => setNotice('받은 초대 확인 기능은 준비 중입니다.')}><Icon name="bell" /><i aria-hidden="true" /></button></div>
+        <div className="workspace-account"><button className="notification-button" aria-label="알림" onClick={() => requireAuth('invite', () => setNotice('받은 초대 확인 기능은 준비 중입니다.'))}><Icon name="bell" /><i aria-hidden="true" /></button></div>
       </header>
 
       <main className="home-main">
         <section className="home-intro" aria-labelledby="home-title">
           <div><h1 id="home-title" tabIndex={-1}>이어서 만들어볼까요?</h1><p>최근 작업에서 팀의 다음 이야기로.</p></div>
           <div className="home-actions">
-            <button className="home-action home-action--primary" onClick={() => setCreateOpen(true)}><span aria-hidden="true">＋</span> 새 프레젠테이션</button>
-            <button className="home-action" onClick={() => upload.current?.click()}><Icon name="upload" /> PPTX 가져오기</button>
+            <button className="home-action home-action--primary" onClick={() => requireAuth('create', () => setCreateOpen(true))}><span aria-hidden="true">＋</span> 새 프레젠테이션</button>
+            <button className="home-action" onClick={() => requireAuth('upload', () => { setNotice('로그인 완료. PPTX 가져오기를 눌러 파일을 선택해 주세요.'); upload.current?.click() })}><Icon name="upload" /> PPTX 가져오기</button>
           </div>
           <input ref={upload} className="sr-only" tabIndex={-1} type="file" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" aria-label="PPTX 파일 선택" onChange={selectFile} />
         </section>
@@ -145,15 +147,14 @@ export function HomePage({ onNavigate }: { onNavigate: (path: string) => void })
           <aside className="home-team-card" aria-labelledby="home-team-title">
             <p className="home-team-eyebrow">함께 만드는 공간</p><h2 id="home-team-title">{data.teamName}</h2>
             <div className="home-team-members"><Collaborators initials={members} /><span>멤버 {data.members.length}명</span></div>
-            <div className="home-team-actions"><button onClick={() => onNavigate('/workspace')}>팀원 · 권한 관리 <span aria-hidden="true">→</span></button><button onClick={() => setNotice('받은 초대 확인 기능은 준비 중입니다. 현재 초대 수는 디자인 예시입니다.')}>받은 초대 2건 <span aria-hidden="true">→</span></button></div>
+            <div className="home-team-actions"><button onClick={() => onNavigate('/workspace')}>팀원 · 권한 관리 <span aria-hidden="true">→</span></button><button onClick={() => requireAuth('invite', () => setNotice('받은 초대 확인 기능은 준비 중입니다. 현재 초대 수는 디자인 예시입니다.'))}>받은 초대 2건 <span aria-hidden="true">→</span></button></div>
           </aside>
         </div>
-        <p className="home-footer-hint">작업하던 자료를 열고, 팀과 같은 화면에서 이어가세요.</p>
       </main>
     </div>
 
     <dialog ref={createDialog} className="home-create-dialog" aria-labelledby="create-title" onCancel={() => setCreateOpen(false)} onClose={() => setCreateOpen(false)}>
-      <div className="home-dialog-heading"><div><p className="home-eyebrow">NEW PRESENTATION</p><h2 id="create-title">어떤 크기로 시작할까요?</h2></div><button aria-label="새 프레젠테이션 닫기" onClick={() => setCreateOpen(false)}><Icon name="close" /></button></div>
+      <div className="home-dialog-heading"><div><h2 id="create-title">프레젠테이션 크기</h2></div><button aria-label="새 프레젠테이션 닫기" onClick={() => setCreateOpen(false)}><Icon name="close" /></button></div>
       <div className="home-format-grid">{formats.map(format => <button key={format.ratio} onClick={() => { setCreateOpen(false); setNotice(`${format.ratio} ${format.name} 선택 완료. 프레젠테이션 편집 기능은 준비 중입니다.`) }}><span className={`home-format-preview home-format-preview--${format.ratio.replace(':', '-')}`}><i /><i /></span><b>{format.ratio}</b><strong>{format.name}</strong><small>{format.detail}</small></button>)}</div>
     </dialog>
     <div className={`workspace-notice ${notice ? 'is-visible' : ''}`} role="status">{notice}</div>
