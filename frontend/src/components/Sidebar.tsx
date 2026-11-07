@@ -60,12 +60,17 @@ export function Sidebar({ expanded, active = 'home', onToggle, onNavigate, onNot
     return () => { document.removeEventListener('pointerdown', dismiss); document.removeEventListener('keydown', escape) }
   }, [accountOpen])
 
+  const openAccount = (path: string) => {
+    setAccountOpen(false)
+    onNavigate(path)
+  }
+
   return <>
     <button className={`sidebar-scrim ${expanded ? 'is-visible' : ''}`} aria-hidden={!expanded} aria-label="사이드바 닫기" tabIndex={-1} onClick={onToggle} />
     <aside ref={sidebar} className={`sidebar ${expanded ? 'sidebar--expanded' : ''}`} aria-label="워크스페이스 탐색">
       <div className="sidebar-head">
         <button className="sidebar-brand" onClick={() => { if (expanded) onToggle(); onNavigate('/home') }} aria-label="PIT 홈으로 이동"><img src="/images/brand/01_mark_only_liquid_glass_1024.png" alt="" width="134" height="89" /></button>
-        <button ref={profile} className="sidebar-profile" aria-expanded={accountOpen} aria-controls={accountOpen ? 'account-menu' : undefined} aria-label="개인 계정 프로필" title={expanded ? undefined : '개인 계정 프로필'} onClick={() => { if (expanded) onToggle(); requireAuth('account', () => setAccountOpen(value => !value)) }}><span className="sidebar-profile-avatar" aria-hidden="true">P</span><span className="sidebar-profile-copy" aria-hidden={!expanded}><strong>{user?.nickname || '내 계정'}</strong><small>개인 프로필</small></span></button>
+        <button ref={profile} className="sidebar-profile" aria-expanded={accountOpen} aria-controls={accountOpen ? 'account-menu' : undefined} aria-label="개인 계정 프로필" title={expanded ? undefined : '개인 계정 프로필'} onClick={() => { if (expanded) onToggle(); requireAuth('account', () => setAccountOpen(value => !value)) }}><span className="sidebar-profile-avatar" aria-hidden="true">{user?.avatarUrl ? <img src={user.avatarUrl} alt="" /> : Array.from(user?.nickname || 'P')[0]}</span><span className="sidebar-profile-copy" aria-hidden={!expanded}><strong>{user?.nickname || '내 계정'}</strong><small>개인 프로필</small></span></button>
         <button ref={toggle} hidden={expanded} className="sidebar-toggle" aria-expanded={expanded} aria-controls="workspace-nav" aria-label="사이드바 펼치기" onClick={onToggle}><Icon name="panel" /></button>
       </div>
       <nav id="workspace-nav" aria-label="메인 메뉴">
@@ -74,12 +79,12 @@ export function Sidebar({ expanded, active = 'home', onToggle, onNavigate, onNot
         </button>)}
       </nav>
       <div className="sidebar-footer">
-        <button className="sidebar-menu sidebar-settings" aria-label="설정" title={expanded ? undefined : '설정'} onClick={() => { if (expanded) onToggle(); requireAuth('account', () => setAccountOpen(value => !value)) }}><Icon name="settings" /><span className="sidebar-label" aria-hidden={!expanded}>설정</span></button>
+        <button className={`sidebar-menu sidebar-settings ${active === 'account' ? 'is-active' : ''}`} aria-label="설정" title={expanded ? undefined : '설정'} onClick={() => { if (expanded) onToggle(); requireAuth('account', () => setAccountOpen(value => !value)) }}><Icon name="settings" /><span className="sidebar-label" aria-hidden={!expanded}>설정</span></button>
       </div>
       {accountOpen && <div ref={accountMenu} id="account-menu" className="sidebar-account-menu" role="group" aria-label="내 계정 메뉴">
         <div className="sidebar-account-name">{user?.nickname || '내 계정'}</div>
-        <button onClick={() => onNotice('프로필 확인 및 수정 기능은 준비 중입니다.')}>프로필 확인 및 수정</button>
-        <button onClick={() => onNotice('로그인 및 보안 기능은 준비 중입니다.')}>로그인 및 보안</button>
+        <button onClick={() => openAccount('/account/profile')}>프로필 확인 및 수정</button>
+        <button onClick={() => openAccount('/account/security')}>로그인 및 보안</button>
         <button className="account-logout" onClick={() => { onNavigate('/home'); void logout().then(() => setAccountOpen(false)).catch(error => onNotice(error.message)) }}>로그아웃</button>
       </div>}
     </aside>

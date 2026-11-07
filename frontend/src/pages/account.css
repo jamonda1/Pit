@@ -1,0 +1,147 @@
+.account-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--home-muted);
+  font-size: 14px;
+}
+.account-breadcrumb strong { color: var(--home-ink); }
+.sidebar-profile-avatar { overflow: hidden; }
+.sidebar-profile-avatar img, .account-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.account-main { max-width: 1296px; }
+.account-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.account-heading > p { grid-column: 1; }
+.account-preview-label {
+  grid-column: 2;
+  grid-row: 1;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--home-mint);
+  color: var(--home-green);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.account-grid { display: grid; grid-template-columns: minmax(170px, 218px) minmax(0, 1fr); gap: 24px; align-items: start; }
+.account-nav { display: grid; gap: 4px; padding: 10px; }
+.account-nav button {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--home-ink);
+  text-align: left;
+}
+.account-nav button:hover { background: var(--home-paper); }
+.account-nav button[aria-current="page"] { background: var(--home-mint); }
+.account-nav strong { font-size: 14px; font-weight: 700; }
+.account-nav small { color: var(--home-muted); font-size: 12px; }
+.account-content { display: grid; gap: 16px; min-width: 0; }
+.account-summary { min-height: 100px; border-radius: 16px; }
+.account-card { min-width: 0; }
+.account-photo { display: flex; align-items: center; gap: 16px; margin-top: 22px; }
+.account-avatar {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--home-mint);
+  color: var(--home-ink);
+  font-size: 26px;
+  font-weight: 700;
+}
+.account-photo-actions, .account-dialog-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.account-main .account-file-input { display: none; }
+.account-profile-fields { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px; margin-top: 8px; }
+.account-text-button {
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--home-green);
+  font-size: 13px;
+  font-weight: 600;
+}
+.account-text-button:hover { background: var(--home-paper); }
+.account-methods { display: grid; gap: 4px; margin: 14px 0 0; padding: 0; list-style: none; }
+.account-methods li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+.account-methods li:nth-child(even) { background: var(--home-paper); }
+.account-method-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--home-mint);
+  color: var(--home-green);
+  font-weight: 700;
+}
+.account-method-icon svg { width: 18px; height: 18px; }
+.account-method-kakao { background: #fff2b8; color: #574310; }
+.account-method-label { display: grid; gap: 2px; }
+.account-method-label strong { font-size: 14px; overflow-wrap: anywhere; }
+.account-method-label small { color: var(--home-muted); font-size: 12px; }
+.account-method-label .is-connected { color: var(--home-green); }
+.account-session { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.account-session button { flex-shrink: 0; }
+.account-withdraw ul { margin: 14px 0; padding-inline-start: 20px; color: var(--home-muted); font-size: 14px; line-height: 1.8; }
+.account-withdraw input { max-width: 360px; }
+.account-dialog-actions { justify-content: flex-end; margin-top: 18px; }
+.account-main button:disabled, .account-dialog button:disabled { opacity: .55; cursor: default; }
+.account-danger { background: #a44236; }
+.account-danger:hover { background: #87372e; }
+.account-dialog input {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--home-line);
+  border-radius: 9px;
+  background: var(--home-paper);
+  color: var(--home-ink);
+  font: inherit;
+}
+.account-social-confirm { display: block; margin: 10px auto 0; }
+
+@media (max-width: 760px) {
+  .account-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .account-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 5px; }
+  .account-nav button { padding: 10px 4px; text-align: center; }
+  .account-nav small { display: none; }
+  .account-nav strong { font-size: 13px; }
+  .account-heading { margin-bottom: 16px; }
+  .account-session { align-items: stretch; flex-direction: column; }
+}
+
+@media (max-width: 520px) {
+  .account-heading > p { grid-column: 1 / -1; }
+  .account-profile-fields { grid-template-columns: minmax(0, 1fr); }
+  .account-photo { gap: 10px; }
+  .account-avatar { width: 56px; height: 56px; font-size: 21px; }
+  .account-methods li { gap: 7px; padding-inline: 3px; }
+  .account-method-icon { width: 28px; height: 28px; font-size: 13px; }
+  .account-method-label strong { font-size: 12px; }
+  .account-methods button { padding-inline: 7px; font-size: 12px; }
+  .account-withdraw .account-dialog-actions > button { flex: 1 1 100%; }
+  .account-dialog input { font-size: 16px; }
+}

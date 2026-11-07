@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
-import { authAdapter, type AuthAdapter, type AuthUser, type Credentials } from './authAdapter'
+import { authAdapter, type AccountAdapter, type AuthAdapter, type AuthUser, type Credentials } from './authAdapter'
 import { AuthModal } from './AuthModal'
 export type AuthReason = 'welcome' | 'create' | 'upload' | 'workspace' | 'document' | 'account' | 'trash' | 'invite'
 type Request = { reason: AuthReason; resume?: () => void }
@@ -7,6 +7,8 @@ type AuthState = {
   status: 'checking' | 'guest' | 'authenticated'; user: AuthUser | null
   requireAuth: (reason: AuthReason, action?: () => void) => void
   logout: () => Promise<void>
+  account?: AccountAdapter
+  isPreview: boolean
 }
 const Context = createContext<AuthState | null>(null)
 export function AuthProvider({ children, adapter = authAdapter }: { children: ReactNode; adapter?: AuthAdapter }) {
@@ -48,7 +50,21 @@ export function AuthProvider({ children, adapter = authAdapter }: { children: Re
     window.setTimeout(() => resume?.(), 0)
   }
   const logout = async () => { await adapter.logout(); setUser(null); setStatus('guest'); pending.current = null; setRequest(null) }
-  return <Context.Provider value={{ status, user, requireAuth, logout }}>{children}
+  const service = adapter.account
+  const account: AccountAdapter | undefined = service && {
+    ...service,
+    async updateProfile(profile) {
+      const updated = await service.updateProfile(profile)
+      setUser(current => current?.id === updated.id ? updated : current)
+      return updated
+    },
+    async updateSocialLogin(provider, connected) {
+      const updated = await service.updateSocialLogin(provider, connected)
+      setUser(current => current?.id === updated.id ? updated : current)
+      return updated
+    },
+  }
+  return <Context.Provider value={{ status, user, requireAuth, logout, account, isPreview: adapter.preview === true }}>{children}
     {request && <AuthModal initialMessage={sessionError} adapter={adapter} onLogin={login} onClose={() => { setRequest(null); setSessionError('') }} />}
   </Context.Provider>
 }

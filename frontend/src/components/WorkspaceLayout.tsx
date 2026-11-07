@@ -6,8 +6,8 @@ import { useWorkspaceData } from './workspaceData'
 import '../pages/home.css'
 import '../pages/management.css'
 
-export function WorkspaceLayout({ page, onNavigate, notice, onNotice, children }: {
-  page: 'workspace' | 'trash'; onNavigate: (path: string) => void
+export function WorkspaceLayout({ page, accountTitle, onNavigate, notice, onNotice, children }: {
+  page: 'workspace' | 'trash' | 'account'; accountTitle?: string; onNavigate: (path: string) => void
   notice: string; onNotice: (message: string) => void; children: ReactNode
 }) {
   const { data, update } = useWorkspaceData()
@@ -29,7 +29,9 @@ export function WorkspaceLayout({ page, onNavigate, notice, onNotice, children }
       onNavigate={navigate} onNotice={onNotice} />
     <div className="workspace-content" inert={expanded}>
       <header className="workspace-top">
-        <WorkspaceSwitcher open={switcherOpen} onOpenChange={setSwitcherOpen} onNavigate={navigate} />
+        {accountTitle ? (
+          <div className="account-breadcrumb"><span>내 계정</span><span aria-hidden="true">/</span><strong>{accountTitle}</strong></div>
+        ) : <WorkspaceSwitcher open={switcherOpen} onOpenChange={setSwitcherOpen} onNavigate={navigate} />}
         <div className="workspace-account">
           <button className="notification-button" aria-label="알림" onClick={() => onNotice('새 알림이 없습니다. 현재 화면은 디자인 미리보기입니다.')}><Icon name="bell" /><i aria-hidden="true" /></button>
         </div>
