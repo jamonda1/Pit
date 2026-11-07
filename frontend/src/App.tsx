@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { PitLoadingExample } from './pages/PitLoadingExample'
 import { HomePage } from './pages/HomePage'
 import { LandingPage } from './pages/LandingPage'
@@ -11,6 +11,23 @@ import { WorkspaceProvider } from './components/workspaceData'
 function AppContent() {
   const { requireAuth, status } = useAuth()
   const [path, setPath] = useState(window.location.pathname)
+  const isProtectedPage = path === '/workspace' || path === '/trash'
+  const displayedPath = isProtectedPage && status !== 'authenticated' ? '/home' : path
+  const previousDisplayedPath = useRef(displayedPath)
+
+  useLayoutEffect(() => {
+    const previous = previousDisplayedPath.current
+    previousDisplayedPath.current = displayedPath
+    if (previous === displayedPath || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const main = document.querySelector<HTMLElement>('.workspace-content > main')
+    const entrance = main?.animate?.([
+      { opacity: 0.25, transform: 'translateY(4px)' },
+      { opacity: 1, transform: 'translateY(0)' },
+    ], { duration: 180, easing: 'cubic-bezier(0.2, 0, 0, 1)' })
+    return () => entrance?.cancel()
+  }, [displayedPath])
+
   useEffect(() => {
     const sync = () => setPath(window.location.pathname)
     window.addEventListener('popstate', sync)
@@ -36,15 +53,12 @@ function AppContent() {
     document.querySelector<HTMLElement>(focusTarget)?.focus({ preventScroll: true })
   }, [path])
   useEffect(() => {
-    if (path === '/workspace' || path === '/trash') {
-      if (status !== 'authenticated') requireAuth(path === '/trash' ? 'trash' : 'workspace')
-    }
-  }, [path, status, requireAuth])
+    if (isProtectedPage && status !== 'authenticated') requireAuth(path === '/trash' ? 'trash' : 'workspace')
+  }, [isProtectedPage, path, status, requireAuth])
   if (path === '/loading-preview') return <PitLoadingExample />
-  return <WorkspaceProvider>{path === '/home' ? <HomePage onNavigate={navigate} />
-    : path === '/workspace' && status === 'authenticated' ? <WorkspacePage onNavigate={navigate} />
-    : path === '/trash' && status === 'authenticated' ? <TrashPage onNavigate={navigate} />
-    : path === '/workspace' || path === '/trash' ? <HomePage onNavigate={navigate} />
+  return <WorkspaceProvider>{displayedPath === '/home' ? <HomePage onNavigate={navigate} />
+    : displayedPath === '/workspace' ? <WorkspacePage onNavigate={navigate} />
+    : displayedPath === '/trash' ? <TrashPage onNavigate={navigate} />
     : <LandingPage onStart={() => { navigate('/home'); requireAuth('welcome') }} />}</WorkspaceProvider>
 }
 
