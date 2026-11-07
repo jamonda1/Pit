@@ -8,10 +8,10 @@ export function WorkspaceSwitcher({ open, onOpenChange, onNavigate }: {
   onOpenChange: (open: boolean) => void
   onNavigate: (path: string) => void
 }) {
-  const { requireAuth } = useAuth()
+  const { requireAuth, user } = useAuth()
   const { data, update } = useWorkspaceData()
   const container = useRef<HTMLDivElement>(null)
-  const personalName = `${data.nickname} 님의 개인 워크스페이스`
+  const personalName = `${user?.nickname || data.nickname} 님의 개인 워크스페이스`
   const name = data.activeWorkspace === 'team' ? data.teamName : personalName
   useEffect(() => {
     if (!open) return
