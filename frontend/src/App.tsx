@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { PitLoadingExample } from './pages/PitLoadingExample'
 import { AccountPage, accountSectionFor } from './pages/AccountPage'
+import { AssetsPage } from './pages/AssetsPage'
 import { HomePage } from './pages/HomePage'
 import { LandingPage } from './pages/LandingPage'
 import { WorkspacePage } from './pages/WorkspacePage'
@@ -12,7 +13,7 @@ import { WorkspaceProvider } from './components/workspaceData'
 
 function authReasonFor(path: string): AuthReason | null {
   if (path === '/workspace') return 'workspace'
-  if (path === '/presentations' || presentationIdFor(path)) return 'document'
+  if (path === '/presentations' || path === '/assets' || presentationIdFor(path)) return 'document'
   if (path === '/trash') return 'trash'
   return accountSectionFor(path) ? 'account' : null
 }
@@ -68,7 +69,7 @@ function AppContent() {
   useEffect(() => {
     document.title = accountSection
       ? `${accountSection.label} — PIT`
-      : ({ '/home': '홈 — PIT', '/workspace': '워크스페이스 — PIT', '/trash': '휴지통 — PIT', '/presentations': '내 프레젠테이션 — PIT' } as Record<string, string>)[displayedPath] || 'PIT — Present It Together'
+      : ({ '/home': '홈 — PIT', '/workspace': '워크스페이스 — PIT', '/trash': '휴지통 — PIT', '/presentations': '내 프레젠테이션 — PIT', '/assets': '에셋 및 폰트 — PIT' } as Record<string, string>)[displayedPath] || 'PIT — Present It Together'
     const focusTarget = path === '/home' && new URLSearchParams(window.location.search).has('search') ? '.home-search input' : 'h1'
     document.querySelector<HTMLElement>(focusTarget)?.focus({ preventScroll: true })
     if (presentationId) document.title = '프레젠테이션 — PIT'
@@ -79,6 +80,7 @@ function AppContent() {
   if (path === '/loading-preview') return <PitLoadingExample />
   return <WorkspaceProvider>{displayedPath === '/home' ? <HomePage onNavigate={navigate} />
     : displayedPath === '/workspace' ? <WorkspacePage onNavigate={navigate} />
+    : displayedPath === '/assets' ? <AssetsPage onNavigate={navigate} />
     : displayedPath === '/trash' ? <TrashPage onNavigate={navigate} />
     : displayedPath === '/presentations' ? <PresentationsPage onNavigate={navigate} />
     : presentationId ? <PresentationEditorPage key={presentationId} id={presentationId} onNavigate={navigate} />

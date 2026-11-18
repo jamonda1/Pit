@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-export type IconName = 'home' | 'folder' | 'template' | 'settings' | 'panel' | 'search' | 'upload' | 'bell' | 'users' | 'trash' | 'plus' | 'mail' | 'chevron' | 'close' | 'check' | 'restore' | 'document'
+export type IconName = 'home' | 'folder' | 'template' | 'settings' | 'panel' | 'search' | 'upload' | 'bell' | 'users' | 'trash' | 'plus' | 'mail' | 'chevron' | 'close' | 'check' | 'restore' | 'document' | 'image' | 'type'
 const paths: Record<IconName, string> = {
   home: 'M3 10 12 3l9 7v11h-6v-7H9v7H3Z',
   folder: 'M3 6h7l2 2h9v13H3Z',
@@ -18,6 +18,8 @@ const paths: Record<IconName, string> = {
   check: 'm5 12 4 4L19 6',
   restore: 'M4 4v6h6M4.5 9A8 8 0 1 1 4 16',
   document: 'M6 3h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM9 8h6m-6 4h6m-6 4h4',
+  image: 'M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Zm-1 13 5-5 4 4 3-3 4 4M15 8h.01',
+  type: 'M5 8V5h14v3m-7-3v14m-4 0h8',
 }
 export function Icon({ name, style }: { name: IconName; style?: CSSProperties }) {
   return <svg style={style} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]} /></svg>
