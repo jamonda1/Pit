@@ -1,11 +1,13 @@
+import { initialPresentations, normalizePresentationName, type Presentation } from './presentationData'
 import { useAuth } from '../auth/AuthProvider'
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 
 export type TeamRole = 'OWNER' | 'ADMIN' | 'EDITOR' | 'VIEWER'
 export type Member = { id: string; name: string; email: string; initial: string; role: TeamRole }
 export type Invitation = { id: string; email: string; role: Exclude<TeamRole, 'OWNER'> }
-export type DeletedItem = { id: string; name: string; place: string; deleted: string; expires: string }
+export type DeletedItem = { id: string; name: string; place: string; deleted: string; expires: string; presentation?: Presentation }
 export type WorkspaceData = {
+  presentations: Presentation[]
   nickname: string
   activeWorkspace: 'personal' | 'team'
   teamName: string
@@ -19,6 +21,7 @@ export type WorkspaceData = {
 }
 
 const initialData: WorkspaceData = {
+  presentations: initialPresentations,
   nickname: '사용자',
   activeWorkspace: 'personal',
   teamName: 'PIT 디자인팀',
@@ -50,6 +53,7 @@ function readData(): WorkspaceData {
     if (saved && typeof saved.teamName === 'string' && typeof saved.description === 'string'
       && ['members', 'invitations', 'deletedDocs', 'deletedTeams', 'restoredDocs', 'restoredTeams'].every(key => Array.isArray(saved[key]))) return {
         ...saved,
+        presentations: Array.isArray(saved.presentations) ? saved.presentations : structuredClone(initialPresentations),
         nickname: typeof saved.nickname === 'string' && saved.nickname.trim() ? saved.nickname.trim() : initialData.nickname,
         activeWorkspace: saved.activeWorkspace === 'team' ? 'team' : 'personal',
       }
@@ -59,9 +63,12 @@ function readData(): WorkspaceData {
 const Context = createContext<{ data: WorkspaceData; update: (change: (data: WorkspaceData) => WorkspaceData) => void } | null>(null)
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const { status } = useAuth()
-  const [data, setData] = useState(() => structuredClone(initialData))
-  useEffect(() => { setData(status === 'authenticated' ? readData() : structuredClone(initialData)) }, [status])
-  useEffect(() => { if (status !== 'authenticated') return; try { localStorage.setItem(storageKey, JSON.stringify(data)) } catch { /* Keep in-memory editing available. */ } }, [data, status])
+  const [savedData, setData] = useState(readData)
+  const data = status === 'authenticated' ? savedData : initialData
+  useEffect(() => {
+    if (status !== 'authenticated') return
+    try { localStorage.setItem(storageKey, JSON.stringify(savedData)) } catch { /* Keep in-memory editing available. */ }
+  }, [savedData, status])
   return <Context.Provider value={{ data, update: setData }}>{children}</Context.Provider>
 }
 export function useWorkspaceData() {
@@ -71,4 +78,16 @@ export function useWorkspaceData() {
 }
 export const roleLabels: Record<Exclude<TeamRole, 'OWNER'>, string> = {
   ADMIN: '관리자', EDITOR: '편집 가능', VIEWER: '읽기 전용',
+}
+
+export function listPresentations(data: WorkspaceData): Presentation[] {
+  return data.presentations.concat(data.restoredDocs.map(item => item.presentation ?? {
+    id: item.id,
+    name: normalizePresentationName(item.name),
+    space: item.place === '내 개인 공간' ? 'personal' : item.place === 'PIT 디자인팀' ? 'team' : 'shared',
+    role: 'OWNER',
+    cover: 'warm',
+    activity: '복구한 자료',
+    updatedAt: 6,
+  }))
 }

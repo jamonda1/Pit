@@ -4,7 +4,7 @@ import { Icon, type IconName } from './Icon'
 
 const menu: { label: string; icon: IconName; id: string; path?: string }[] = [
   { label: '홈', icon: 'home', id: 'home', path: '/home' },
-  { label: '프레젠테이션', icon: 'folder', id: 'presentations' },
+  { label: '프레젠테이션', icon: 'folder', id: 'presentations', path: '/presentations' },
   { label: '워크스페이스', icon: 'users', id: 'workspace', path: '/workspace' },
   { label: '템플릿', icon: 'template', id: 'templates' },
   { label: '휴지통', icon: 'trash', id: 'trash', path: '/trash' },

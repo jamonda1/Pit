@@ -4,14 +4,21 @@ import { AccountPage, accountSectionFor } from './pages/AccountPage'
 import { HomePage } from './pages/HomePage'
 import { LandingPage } from './pages/LandingPage'
 import { WorkspacePage } from './pages/WorkspacePage'
+import { PresentationsPage } from './pages/PresentationsPage'
+import { PresentationEditorPage } from './pages/PresentationEditorPage'
 import { TrashPage } from './pages/TrashPage'
 import { AuthProvider, useAuth, type AuthReason } from './auth/AuthProvider'
 import { WorkspaceProvider } from './components/workspaceData'
 
 function authReasonFor(path: string): AuthReason | null {
   if (path === '/workspace') return 'workspace'
+  if (path === '/presentations' || presentationIdFor(path)) return 'document'
   if (path === '/trash') return 'trash'
   return accountSectionFor(path) ? 'account' : null
+}
+
+function presentationIdFor(path: string): string | undefined {
+  return /^\/presentations\/([a-z0-9-]+)$/.exec(path)?.[1]
 }
 
 // Keep client navigation lightweight while supporting direct links and browser history.
@@ -20,6 +27,7 @@ function AppContent() {
   const [path, setPath] = useState(window.location.pathname)
   const authReason = authReasonFor(path)
   const displayedPath = authReason && status !== 'authenticated' ? '/home' : path
+  const presentationId = presentationIdFor(displayedPath)
   const accountSection = accountSectionFor(displayedPath)
   const previousDisplayedPath = useRef(displayedPath)
 
@@ -28,7 +36,7 @@ function AppContent() {
     previousDisplayedPath.current = displayedPath
     if (previous === displayedPath || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    const main = document.querySelector<HTMLElement>('.workspace-content > main')
+    const main = document.querySelector<HTMLElement>('.workspace-content > main, .presentation-editor-main')
     const entrance = main?.animate?.([
       { opacity: 0.25, transform: 'translateY(4px)' },
       { opacity: 1, transform: 'translateY(0)' },
@@ -60,10 +68,11 @@ function AppContent() {
   useEffect(() => {
     document.title = accountSection
       ? `${accountSection.label} — PIT`
-      : ({ '/home': '홈 — PIT', '/workspace': '워크스페이스 — PIT', '/trash': '휴지통 — PIT' } as Record<string, string>)[displayedPath] || 'PIT — Present It Together'
+      : ({ '/home': '홈 — PIT', '/workspace': '워크스페이스 — PIT', '/trash': '휴지통 — PIT', '/presentations': '내 프레젠테이션 — PIT' } as Record<string, string>)[displayedPath] || 'PIT — Present It Together'
     const focusTarget = path === '/home' && new URLSearchParams(window.location.search).has('search') ? '.home-search input' : 'h1'
     document.querySelector<HTMLElement>(focusTarget)?.focus({ preventScroll: true })
-  }, [accountSection, displayedPath, path])
+    if (presentationId) document.title = '프레젠테이션 — PIT'
+  }, [accountSection, displayedPath, path, presentationId])
   useEffect(() => {
     if (authReason && status !== 'authenticated') requireAuth(authReason)
   }, [authReason, path, status, requireAuth])
@@ -71,6 +80,8 @@ function AppContent() {
   return <WorkspaceProvider>{displayedPath === '/home' ? <HomePage onNavigate={navigate} />
     : displayedPath === '/workspace' ? <WorkspacePage onNavigate={navigate} />
     : displayedPath === '/trash' ? <TrashPage onNavigate={navigate} />
+    : displayedPath === '/presentations' ? <PresentationsPage onNavigate={navigate} />
+    : presentationId ? <PresentationEditorPage key={presentationId} id={presentationId} onNavigate={navigate} />
     : accountSection ? <AccountPage key={accountSection.id} section={accountSection} onNavigate={navigate} />
     : <LandingPage onStart={() => { navigate('/home'); requireAuth('welcome') }} />}</WorkspaceProvider>
 }
