@@ -1,0 +1,104 @@
+.presentation-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.presentation-actions { margin-top: 0; }
+.presentation-filters { display: grid; grid-template-columns: minmax(180px, 1.9fr) repeat(3, minmax(112px, 1fr)) auto; gap: 10px; padding: 14px; }
+.presentation-search { position: relative; min-width: 0; }
+.presentation-search svg { position: absolute; width: 17px; height: 17px; inset: 14px auto auto 12px; color: var(--home-muted); pointer-events: none; }
+.presentation-search input { padding-left: 37px; }
+.presentation-filters button { white-space: nowrap; }
+.presentation-main .presentation-count { font-size: 16px; margin: 18px 0 10px; }
+.presentation-results > ul { list-style: none; margin: 0; padding: 0; }
+.presentation-results.is-list { border: 1px solid var(--home-line); border-radius: 16px; background: white; }
+.presentation-table-heading, .presentation-row { display: grid; grid-template-columns: minmax(180px, 2.5fr) minmax(100px, 1fr) minmax(100px, .85fr) 98px; align-items: center; gap: 14px; }
+.presentation-table-heading { padding: 14px 18px; border-radius: 15px 15px 0 0; background: var(--home-mint); color: var(--home-muted); font-size: 12px; font-weight: 600; }
+.presentation-row { min-height: 72px; padding: 10px 18px; border-top: 1px solid var(--home-line); }
+.presentation-document { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 0; border: 0; border-radius: 8px; background: transparent; text-align: left; color: var(--home-ink); }
+.presentation-document:hover strong { color: var(--home-green); }
+.presentation-document strong, .presentation-document small, .presentation-space { display: block; overflow-wrap: anywhere; }
+.presentation-document strong { font-size: 14px; }
+.presentation-document small, .presentation-date { color: var(--home-muted); font-size: 12px; }
+.presentation-space { font-size: 13px; }
+.presentation-thumbnail { display: grid; place-items: center; flex: 0 0 52px; height: 44px; border-radius: 8px; }
+.presentation-thumbnail.home-cover--forest { background: var(--home-mint); color: var(--home-ink); }
+.presentation-thumbnail svg { width: 21px; height: 21px; }
+.presentation-row-actions { display: flex; align-items: center; gap: 4px; }
+.presentation-text-action, .presentation-more summary { display: grid; min-width: 44px; min-height: 44px; place-items: center; border: 0; border-radius: 8px; background: transparent; color: var(--home-green); font-size: 13px; font-weight: 600; }
+.presentation-text-action:hover, .presentation-more summary:hover, .presentation-more[open] summary { background: var(--home-paper); }
+.presentation-more { position: relative; }
+.presentation-more summary { list-style: none; cursor: pointer; font-size: 20px; color: var(--home-ink); }
+.presentation-more summary::-webkit-details-marker { display: none; }
+.presentation-more > div { position: absolute; right: 0; top: calc(100% + 4px); z-index: 5; width: max-content; min-width: 148px; padding: 5px; border: 1px solid var(--home-line); border-radius: 10px; background: white; box-shadow: 0 8px 28px #153f3522; }
+.presentation-more > div button { display: block; width: 100%; min-height: 36px; padding: 6px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--home-ink); text-align: left; font-size: 13px; }
+.presentation-more > div button:hover { background: var(--home-paper); }
+.presentation-more > div button:last-child { color: #a44236; }
+.presentation-results.is-cards .presentation-table-heading { display: none; }
+.presentation-results.is-cards ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px; }
+.presentation-results.is-cards .presentation-row { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; align-content: start; border: 1px solid var(--home-line); border-radius: 14px; background: white; }
+.presentation-results.is-cards .presentation-document { flex-basis: 100%; margin-bottom: 5px; }
+.presentation-results.is-cards .presentation-date { margin-right: auto; }
+.presentation-pagination { display: flex; align-items: center; justify-content: end; gap: 10px; margin-top: 16px; font-size: 13px; }
+.presentation-pagination button { min-height: 40px; padding: 0 12px; border: 1px solid var(--home-line); border-radius: 8px; background: white; color: var(--home-ink); }
+.presentation-pagination button:disabled { opacity: .5; cursor: default; }
+.presentation-form { margin-top: 14px; }
+.presentation-form p { margin: 10px 0; color: var(--home-muted); font-size: 13px; line-height: 1.6; }
+.presentation-form label, .presentation-form legend { display: block; margin: 14px 0 6px; color: var(--home-ink); font-size: 13px; font-weight: 600; }
+.presentation-form input:not([type="radio"], [type="file"]), .presentation-form select { display: block; width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid var(--home-line); border-radius: 8px; background: var(--home-paper); color: var(--home-ink); }
+.presentation-form fieldset { min-width: 0; border: 0; margin: 12px 0 0; padding: 0; }
+.presentation-form .management-dialog-actions { margin-top: 16px; }
+.presentation-form button:disabled { opacity: .55; cursor: default; }
+.presentation-format-grid { margin: 0; }
+.presentation-format-grid > label { position: relative; display: flex; min-width: 0; margin: 0; padding: 10px 8px; flex-direction: column; align-items: center; justify-content: flex-end; border: 1px solid var(--home-line); border-radius: 12px; background: var(--home-paper); text-align: center; cursor: pointer; }
+.presentation-format-grid > label:has(input:checked) { border-color: var(--home-green); background: var(--home-mint); }
+.presentation-format-grid > label:focus-within { outline: 2px solid var(--home-green); outline-offset: 2px; }
+.presentation-format-grid .home-format-preview { margin: auto 0 8px; }
+.presentation-drop { display: grid; place-items: center; width: 100%; gap: 8px; min-height: 120px; padding: 15px; border: 1px dashed var(--home-green); border-radius: 12px; background: var(--home-paper); color: var(--home-green); }
+.presentation-drop strong { font-size: 14px; overflow-wrap: anywhere; }
+.presentation-drop small { color: var(--home-muted); }
+.presentation-share-add { margin-top: 10px; }
+.presentation-shares { display: grid; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
+.presentation-shares li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px; border-radius: 8px; background: var(--home-paper); }
+.presentation-shares span { min-width: 0; overflow-wrap: anywhere; }
+.presentation-shares small { display: block; color: var(--home-muted); }
+.presentation-shares button { flex-shrink: 0; }
+.presentation-editor-header { display: flex; align-items: center; gap: 14px; padding: 10px 20px; border-bottom: 1px solid var(--home-line); background: white; }
+.presentation-editor-header > div { flex: 1; min-width: 0; }
+.presentation-editor-header h1 { font-size: 16px; font-weight: 700; overflow-wrap: anywhere; }
+.presentation-editor-header h1:focus { outline: none; }
+.presentation-editor-header p { color: var(--home-muted); font-size: 12px; overflow-wrap: anywhere; }
+.presentation-editor-header button { flex-shrink: 0; }
+.presentation-editor-main { display: flex; align-items: stretch; gap: 14px; padding: 20px; }
+.presentation-editor-stage { flex: 1; justify-content: center; min-height: min(62vh, 560px); }
+.presentation-editor-stage h2 { font-size: 19px; font-weight: 700; }
+.presentation-assets { flex: 0 0 260px; }
+.presentation-assets p { color: var(--home-muted); font-size: 13px; }
+.presentation-asset-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 12px 0; }
+.presentation-asset-tabs button { min-height: 42px; border: 0; border-radius: 8px; background: var(--home-paper); color: var(--home-ink); }
+.presentation-asset-tabs button[aria-pressed="true"] { background: var(--home-mint); color: var(--home-green); }
+@media (max-width: 950px) {
+  .presentation-filters { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .presentation-search { grid-column: 1 / -1; }
+  .presentation-table-heading, .presentation-row { grid-template-columns: minmax(145px, 2fr) minmax(75px, 1fr) minmax(76px, .8fr) 94px; gap: 8px; }
+}
+@media (max-width: 720px) {
+  .presentation-heading { flex-direction: column; }
+  .presentation-results.is-list .presentation-table-heading { display: none; }
+  .presentation-row { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 8px; padding: 10px 12px; }
+  .presentation-row:first-child { border-top: 0; }
+  .presentation-document { grid-column: 1; grid-row: 1; }
+  .presentation-space, .presentation-date { grid-column: 1; padding-left: 0; }
+  .presentation-row-actions { grid-column: 2; grid-row: 1 / span 3; }
+  .presentation-editor-main { flex-direction: column; }
+  .presentation-assets { flex-basis: auto; }
+}
+@media (max-width: 520px) {
+  .presentation-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .presentation-filters select { padding-inline: 8px 20px; }
+  .presentation-actions { width: 100%; }
+  .presentation-format-grid > label { display: grid; grid-template-columns: 64px 1fr; align-items: center; gap: 2px 8px; text-align: left; }
+  .presentation-format-grid .home-format-preview { grid-row: 1 / span 3; margin: auto; }
+  .presentation-editor-header { flex-wrap: wrap; padding: 8px 12px; }
+  .presentation-editor-header > div { flex-basis: 100%; order: 2; }
+  .presentation-editor-main { padding: 12px; }
+  .presentation-row-actions { gap: 0; flex-direction: column; }
+  .presentation-thumbnail { flex-basis: 32px; height: 34px; }
+  .presentation-document { gap: 7px; }
+}

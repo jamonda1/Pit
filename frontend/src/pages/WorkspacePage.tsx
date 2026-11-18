@@ -1,14 +1,13 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { Icon } from '../components/Icon'
 import { WorkspaceLayout } from '../components/WorkspaceLayout'
-import { roleLabels, useWorkspaceData, type Member, type TeamRole } from '../components/workspaceData'
+import { listPresentations, roleLabels, useWorkspaceData, type Member, type TeamRole } from '../components/workspaceData'
 
 const tabs = [
   { id: 'presentations', label: '프레젠테이션' }, { id: 'members', label: '멤버 관리' },
   { id: 'invitations', label: '보낸 초대' }, { id: 'settings', label: '워크스페이스 설정' },
 ] as const
 type WorkspaceTab = typeof tabs[number]['id']
-const presentationNames = ['팀 프로젝트 발표', '서비스 기획안', 'PIT 브랜드 가이드', '사용자 리서치', '제품 로드맵', '디자인 시스템', '협업 경험 제안', '11월 팀 회의', '프로토타입 리뷰', '서비스 소개', '발표 구성안', '다음 프로젝트']
 
 export function WorkspacePage({ onNavigate }: { onNavigate: (path: string) => void }) {
   const { data, update } = useWorkspaceData()
@@ -23,7 +22,7 @@ export function WorkspacePage({ onNavigate }: { onNavigate: (path: string) => vo
   const [description, setDescription] = useState(data.description)
   const emailInput = useRef<HTMLInputElement>(null)
   const roleDialog = useRef<HTMLDialogElement>(null)
-  const restoredDocs = data.restoredDocs.filter(item => item.place === 'PIT 디자인팀')
+  const teamPresentations = listPresentations(data).filter(doc => doc.space === 'team')
   const focusInvite = () => { setTab('members'); window.requestAnimationFrame(() => emailInput.current?.focus()) }
   const submitInvite = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -56,7 +55,7 @@ export function WorkspacePage({ onNavigate }: { onNavigate: (path: string) => vo
 
   return <WorkspaceLayout page="workspace" onNavigate={onNavigate} notice={notice} onNotice={setNotice}>
     <main className="management-main team-main">
-      <section className="team-summary" aria-labelledby="team-title"><div><h1 id="team-title" tabIndex={-1}>{data.teamName}</h1><p className="team-description">{data.description}</p><div className="team-stats"><span>멤버 {data.members.length}명</span><span>프레젠테이션 {presentationNames.length + restoredDocs.length}개</span></div></div>
+      <section className="team-summary" aria-labelledby="team-title"><div><h1 id="team-title" tabIndex={-1}>{data.teamName}</h1><p className="team-description">{data.description}</p><div className="team-stats"><span>멤버 {data.members.length}명</span><span>프레젠테이션 {teamPresentations.length}개</span></div></div>
         <div className="team-summary-actions"><button className="management-primary" onClick={focusInvite}><span aria-hidden="true">＋</span> 팀원 초대</button><button className="team-settings-link" onClick={() => setTab('settings')}><Icon name="settings" />설정</button></div>
       </section>
       <div className="management-tabs team-tabs" role="tablist" aria-label="워크스페이스 관리">
@@ -82,7 +81,7 @@ export function WorkspacePage({ onNavigate }: { onNavigate: (path: string) => vo
           event.preventDefault(); if (!teamName.trim()) return
           update(previous => ({ ...previous, teamName: teamName.trim(), description: description.trim() })); setNotice('워크스페이스 설정을 이 브라우저에 저장했습니다.')
         }}><label htmlFor="team-name">워크스페이스 이름</label><input id="team-name" required maxLength={40} value={teamName} onChange={event => setTeamName(event.target.value)} /><label htmlFor="team-description">소개</label><textarea id="team-description" maxLength={160} rows={3} value={description} onChange={event => setDescription(event.target.value)} /><button className="management-primary" type="submit">변경 사항 저장</button></form></section>}
-        {tab === 'presentations' && <section className="management-card team-presentations-card"><div className="management-section-heading"><h2>팀 프레젠테이션</h2><span>총 {presentationNames.length + restoredDocs.length}개</span></div><p className="management-description">팀과 함께 만드는 발표 자료를 한곳에서 확인하세요.</p><div className="team-presentation-grid">{[...restoredDocs.map(item => item.name), ...presentationNames].map((name, index) => <button key={name} className="team-presentation" onClick={() => setNotice(`${name}은 미리보기 자료입니다. 편집 기능은 준비 중입니다.`)}><span className={`team-presentation-art art-${index % 3}`}><span><i /><i /><i /></span></span><strong>{name}</strong><small>{data.teamName} · {index < restoredDocs.length ? '복구한 자료' : '함께 편집'}</small></button>)}</div></section>}
+        {tab === 'presentations' && <section className="management-card team-presentations-card"><div className="management-section-heading"><h2>팀 프레젠테이션</h2><span>총 {teamPresentations.length}개</span></div><p className="management-description">팀과 함께 만드는 발표 자료를 한곳에서 확인하세요.</p><div className="team-presentation-grid">{teamPresentations.map((doc, index) => <button key={doc.id} className="team-presentation" onClick={() => onNavigate(`/presentations/${doc.id}`)}><span className={`team-presentation-art art-${index % 3}`}><span><i /><i /><i /></span></span><strong>{doc.name}</strong><small>{data.teamName} · {doc.ratio ? '초안' : doc.activity === '복구한 자료' ? '복구한 자료' : '팀 자료'}</small></button>)}</div></section>}
       </div>
       {!!data.restoredTeams.length && <section className="management-card restored-teams"><h2>복구한 공간</h2><p className="management-description">휴지통에서 복구한 워크스페이스 예시입니다.</p>{data.restoredTeams.map(team => <div key={team.id}><Icon name="folder" /><strong>{team.name}</strong><span>복구 완료</span></div>)}</section>}
     </main>

@@ -7,7 +7,7 @@ import '../pages/home.css'
 import '../pages/management.css'
 
 export function WorkspaceLayout({ page, accountTitle, onNavigate, notice, onNotice, children }: {
-  page: 'workspace' | 'trash' | 'account'; accountTitle?: string; onNavigate: (path: string) => void
+  page: 'workspace' | 'trash' | 'account' | 'presentations'; accountTitle?: string; onNavigate: (path: string) => void
   notice: string; onNotice: (message: string) => void; children: ReactNode
 }) {
   const { data, update } = useWorkspaceData()

@@ -18,7 +18,7 @@ export function TrashPage({ onNavigate }: { onNavigate: (path: string) => void }
     update(previous => tab === 'docs'
       ? { ...previous, deletedDocs: previous.deletedDocs.filter(item => item.id !== restoring.id), restoredDocs: [...previous.restoredDocs, restoring] }
       : { ...previous, deletedTeams: previous.deletedTeams.filter(item => item.id !== restoring.id), restoredTeams: [...previous.restoredTeams, restoring] })
-    setNotice(`${restoring.name} 복구 미리보기를 완료했습니다. ${tab === 'docs' ? '홈의 최근 프레젠테이션' : '워크스페이스의 복구한 공간'}에서 확인하세요.`)
+    setNotice(`${restoring.name} 복구 미리보기를 완료했습니다. ${tab === 'docs' ? '내 프레젠테이션' : '워크스페이스의 복구한 공간'}에서 확인하세요.`)
     dialog.current?.close()
   }
   return <WorkspaceLayout page="trash" onNavigate={onNavigate} notice={notice} onNotice={setNotice}>
@@ -43,7 +43,7 @@ export function TrashPage({ onNavigate }: { onNavigate: (path: string) => void }
             <td data-label={tab === 'docs' ? '원래 위치' : '공간 유형'}>{item.place === 'PIT 디자인팀' ? data.teamName : item.place}</td><td data-label="삭제일">{item.deleted}</td><td data-label="복구 만료일" className="trash-expiry">{item.expires}</td>
             <td><button className="restore-button" aria-label={`${item.name} 복구하기`} onClick={() => { setRestoring(item); dialog.current?.showModal() }}>복구하기</button></td>
           </tr>)}</tbody>
-        </table> : <div className="management-empty"><Icon name="trash" /><h3>삭제된 {tab === 'docs' ? '프레젠테이션이' : '워크스페이스가'} 없어요.</h3><p>복구한 항목은 원래 공간에서 확인할 수 있어요.</p><button className="management-secondary" onClick={() => onNavigate(tab === 'docs' ? '/home' : '/workspace')}>{tab === 'docs' ? '홈으로 이동' : '워크스페이스로 이동'} <span aria-hidden="true">→</span></button></div>}
+        </table> : <div className="management-empty"><Icon name="trash" /><h3>삭제된 {tab === 'docs' ? '프레젠테이션이' : '워크스페이스가'} 없어요.</h3><p>복구한 항목은 원래 공간에서 확인할 수 있어요.</p><button className="management-secondary" onClick={() => onNavigate(tab === 'docs' ? '/presentations' : '/workspace')}>{tab === 'docs' ? '내 프레젠테이션으로 이동' : '워크스페이스로 이동'} <span aria-hidden="true">→</span></button></div>}
       </section>
     </main>
     <dialog ref={dialog} className="management-dialog" aria-labelledby="restore-title" onClose={() => { setRestoring(null); if (restored.current) { restored.current = false; document.querySelector<HTMLElement>('.trash-card h2')?.focus() } }}>
