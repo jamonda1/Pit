@@ -1,8 +1,12 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Icon } from '../components/Icon'
 import { getPresentationFile } from '../components/presentationFiles'
 import { presentationName, presentationSpace } from '../components/presentationData'
 import { listPresentations, useWorkspaceData } from '../components/workspaceData'
+
+const LocalOnlyOffice = import.meta.env.DEV && import.meta.env.VITE_PIT_LOCAL_OFFICE
+  ? lazy(async () => ({ default: (await import('../components/LocalOnlyOffice')).LocalOnlyOffice }))
+  : null
 
 export function PresentationEditorPage({ id, onNavigate }: { id: string; onNavigate: (path: string) => void }) {
   const { data } = useWorkspaceData()
@@ -15,7 +19,18 @@ export function PresentationEditorPage({ id, onNavigate }: { id: string; onNavig
   const back = () => onNavigate('/presentations')
 
   useEffect(() => {
-    if (!hasFile) return
+    const preventBrowserSave = (event: KeyboardEvent) => {
+      const saveKey = event.code === 'KeyS' || event.key.toLowerCase() === 's'
+      if (saveKey && (event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey) {
+        event.preventDefault()
+      }
+    }
+    window.addEventListener('keydown', preventBrowserSave)
+    return () => window.removeEventListener('keydown', preventBrowserSave)
+  }, [])
+
+  useEffect(() => {
+    if (!hasFile || LocalOnlyOffice) return
     let url: string | undefined
     let active = true
     void getPresentationFile(id).then(file => {
@@ -39,14 +54,18 @@ export function PresentationEditorPage({ id, onNavigate }: { id: string; onNavig
       {doc && <button className="management-secondary" aria-expanded={assetsOpen} onClick={() => setAssetsOpen(open => !open)}>에셋</button>}
     </header>
     <main className="presentation-editor-main">
-      <section className="management-card management-empty presentation-editor-stage" aria-labelledby="presentation-stage-title">
+      {doc && LocalOnlyOffice
+        ? <Suspense fallback={<p role="status">편집기를 불러오는 중…</p>}>
+          <LocalOnlyOffice id={doc.id} title={`${doc.name}.pptx`} imported={hasFile} ratio={doc.ratio} readOnly={doc.role === 'VIEWER'} />
+        </Suspense>
+        : <section className="management-card management-empty presentation-editor-stage" aria-labelledby="presentation-stage-title">
         <Icon name="document" />
         <h2 id="presentation-stage-title">{doc ? '편집기 연결 대기 중' : '열 수 있는 문서가 없어요'}</h2>
         <p>{doc ? 'ONLYOFFICE가 연결되면 여기에서 문서를 편집할 수 있어요.' : '삭제된 문서는 휴지통에서 확인할 수 있어요.'}</p>
         {downloadUrl && doc && <a className="management-secondary" href={downloadUrl} download={`${doc.name}.pptx`}>원본 PPTX 다운로드</a>}
         {hasFile && fileReady && !downloadUrl && <p role="status">이 브라우저에 원본 파일이 없어요.</p>}
         {!doc && <button className="management-secondary" onClick={back}>목록으로 돌아가기</button>}
-      </section>
+      </section>}
       {doc && assetsOpen && <aside className="management-card presentation-assets" aria-label="에셋 패널">
         <div className="management-dialog-heading"><h2>에셋</h2><button aria-label="에셋 닫기" onClick={() => setAssetsOpen(false)}><Icon name="close" /></button></div>
         <div className="presentation-asset-tabs" role="group" aria-label="에셋 종류">

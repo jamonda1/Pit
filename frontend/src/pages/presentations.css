@@ -102,3 +102,11 @@
   .presentation-thumbnail { flex-basis: 32px; height: 34px; }
   .presentation-document { gap: 7px; }
 }
+
+.local-office { flex: 1; min-width: 0; padding: 0; overflow: hidden; }
+.local-office-status { padding: 10px 14px; color: var(--home-muted); font-size: 13px; }
+.local-office-frame { height: max(480px, calc(100dvh - 96px)); }
+.local-office-frame iframe { display: block; width: 100%; border: 0; }
+@media (max-width: 520px) {
+  .local-office-frame { height: max(480px, calc(100dvh - 125px)); }
+}
